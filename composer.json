@@ -1,0 +1,72 @@
+{
+  "name": "johnhenry/craft-clicky-analytics",
+  "description": "Clicky web analytics for Craft CMS: native dashboard widgets and a per-entry page-stats field, with a live visitor feed, country drilldown and themeable colour schemes, powered by the Clicky API.",
+  "type": "craft-plugin",
+  "version": "1.0.0",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin",
+    "clicky",
+    "clicky-analytics",
+    "analytics",
+    "web-analytics",
+    "statistics",
+    "reporting",
+    "dashboard",
+    "widgets",
+    "live-visitors"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "John Henry",
+      "homepage": "https://johnhenry.ie"
+    }
+  ],
+  "homepage": "https://github.com/john-henry/craft-clicky-analytics",
+  "require": {
+    "php": "^8.2 || ^8.3 || ^8.4",
+    "craftcms/cms": "^5.0"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "johnhenry\\clickyanalytics\\": "src/"
+    }
+  },
+  "scripts": {
+    "phpstan": "phpstan --ansi --memory-limit=1G",
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --fix --ansi"
+  },
+  "config": {
+    "allow-plugins": {
+      "craftcms/plugin-installer": true,
+      "pestphp/pest-plugin": true,
+      "yiisoft/yii2-composer": true
+    },
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "support": {
+    "docs": "https://johnhenry.ie/plugins/clicky-analytics/",
+    "source": "https://github.com/john-henry/craft-clicky-analytics",
+    "issues": "https://github.com/john-henry/craft-clicky-analytics/issues"
+  },
+  "extra": {
+    "name": "Clicky Analytics",
+    "handle": "clicky-analytics",
+    "developer": "John Henry",
+    "developerUrl": "https://johnhenry.ie",
+    "documentationUrl": "https://johnhenry.ie/plugins/clicky-analytics/",
+    "changelogUrl": "https://github.com/john-henry/craft-clicky-analytics/blob/main/CHANGELOG.md",
+    "class": "johnhenry\\clickyanalytics\\ClickyAnalytics"
+  }
+}

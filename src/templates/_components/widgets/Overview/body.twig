@@ -1,0 +1,10 @@
+{# Overview widget body: headline metrics with trends + a visitors area chart. #}
+<div class="clicky-widget {{ clickyUiClass|default('') }}" style="--clicky-accent: {{ accent }}; --clicky-soft: {{ soft }}">
+    <div class="clicky-stats clicky-stats--compact">
+        {% include 'clicky-analytics/_components/_statCard' with { label: 'Visitors'|t('clicky-analytics'), metric: overview.visitors } only %}
+        {% include 'clicky-analytics/_components/_statCard' with { label: 'Actions'|t('clicky-analytics'), metric: overview.actions } only %}
+        {% include 'clicky-analytics/_components/_statCard' with { label: 'Bounce'|t('clicky-analytics'), metric: overview.bounceRate, suffix: '%' } only %}
+        {% include 'clicky-analytics/_components/_statCard' with { label: 'Avg. time'|t('clicky-analytics'), metric: overview.time } only %}
+    </div>
+    {% include 'clicky-analytics/_components/_lineChart' with { series: series } only %}
+</div>

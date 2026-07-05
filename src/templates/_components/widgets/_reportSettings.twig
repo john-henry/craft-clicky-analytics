@@ -1,0 +1,52 @@
+{# Settings UI for the configurable report widget. #}
+{% import '_includes/forms' as forms %}
+
+{% set metricOpts = [{ optgroup: 'Totals'|t('clicky-analytics') }] %}
+{% for value, label in totalOptions %}
+    {% set metricOpts = metricOpts|merge([{ label: label, value: value }]) %}
+{% endfor %}
+{% set metricOpts = metricOpts|merge([{ optgroup: 'Reports'|t('clicky-analytics') }]) %}
+{% for value, label in reportOptions %}
+    {% set metricOpts = metricOpts|merge([{ label: label, value: value }]) %}
+{% endfor %}
+
+{{ forms.selectField({
+    label: 'Display'|t('clicky-analytics'),
+    instructions: 'How to visualise the metric.'|t('clicky-analytics'),
+    id: 'display',
+    name: 'display',
+    options: displayOptions,
+    value: widget.display,
+}) }}
+
+{{ forms.selectField({
+    label: 'Metric'|t('clicky-analytics'),
+    instructions: 'Totals suit Counter and Line; reports suit Bar and Pie.'|t('clicky-analytics'),
+    id: 'metric',
+    name: 'metric',
+    options: metricOpts,
+    value: widget.metric,
+}) }}
+
+{% set rangeOpts = { '': 'Plugin default'|t('clicky-analytics') }|merge(rangeOptions) %}
+{% if widget.dateRange and rangeOpts[widget.dateRange] is not defined %}
+    {% set rangeOpts = rangeOpts|merge({ (widget.dateRange): widget.dateRange }) %}
+{% endif %}
+
+{{ forms.selectField({
+    label: 'Date range'|t('clicky-analytics'),
+    id: 'dateRange',
+    name: 'dateRange',
+    options: rangeOpts,
+    value: widget.dateRange,
+}) }}
+
+{{ forms.textField({
+    label: 'Rows'|t('clicky-analytics'),
+    instructions: 'How many rows to show (Bar, Pie).'|t('clicky-analytics'),
+    id: 'limit',
+    name: 'limit',
+    type: 'number',
+    size: 4,
+    value: widget.limit,
+}) }}

@@ -1,0 +1,15 @@
+{# Configurable report widget body: renders the chosen visualisation. #}
+<div class="clicky-widget {{ clickyUiClass|default('') }}" style="--clicky-accent: {{ accent }}">
+    {% if display == 'counter' %}
+        <div class="clicky-counter">
+            <div class="clicky-counter__value">{{ value }}</div>
+            <div class="clicky-counter__label">{{ label }}</div>
+        </div>
+    {% elseif display == 'line' %}
+        {% include 'clicky-analytics/_components/_lineChart' with { series: series } only %}
+    {% elseif display == 'pie' %}
+        {% include 'clicky-analytics/_components/_pieChart' with { rows: rows } only %}
+    {% else %}
+        {% include 'clicky-analytics/_components/_rankedList' with { rows: rows, accent: accent } only %}
+    {% endif %}
+</div>

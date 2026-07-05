@@ -1,0 +1,42 @@
+{# ============================================================================
+ # Clicky live visitor feed
+ # The most recent individual visits: flag, location, landing page, browser/OS,
+ # referrer and dwell time. Used by the Live Visitors widget and the page field.
+ # ========================================================================== #}
+{% if visitors is empty %}
+    <p class="clicky-muted">{{ 'No recent visitors.'|t('clicky-analytics') }}</p>
+{% else %}
+    <ul class="clicky-feed">
+        {% for v in visitors %}
+            <li class="clicky-feed__row">
+                <span class="clicky-feed__flag">
+                    {% if v.countryCode %}
+                        <img class="clicky-flag" src="{{ craft.clickyAnalytics.assetUrl('flags/' ~ v.countryCode ~ '.svg') }}" alt="" width="22" height="16" loading="lazy">
+                    {% endif %}
+                </span>
+                <div class="clicky-feed__who">
+                    <div class="clicky-feed__loc">
+                        <span>{{ v.geolocation }}</span>
+                        <span class="clicky-feed__badge clicky-feed__badge--{{ v.returning ? 'returning' : 'new' }}">
+                            {{ v.returning ? 'Returning'|t('clicky-analytics') : 'New'|t('clicky-analytics') }}
+                        </span>
+                    </div>
+                    <div class="clicky-feed__page">
+                        <a href="{{ v.landingPage }}" target="_blank" rel="noopener" title="{{ v.landingPage }}">{{ v.landingPath }}</a>
+                    </div>
+                </div>
+                {% if v.browserLogo or v.osLogo %}
+                <div class="clicky-feed__tech">
+                    <span class="visually-hidden">{{ v.browserLabel }}, {{ v.osLabel }}</span>
+                    {% if v.browserLogo %}<img class="clicky-logo" src="{{ craft.clickyAnalytics.assetUrl(v.browserLogo ~ '.svg') }}" alt="" width="18" height="18" loading="lazy">{% endif %}
+                    {% if v.osLogo %}<img class="clicky-logo" src="{{ craft.clickyAnalytics.assetUrl(v.osLogo ~ '.svg') }}" alt="" width="18" height="18" loading="lazy">{% endif %}
+                </div>
+                {% endif %}
+                <div class="clicky-feed__meta">
+                    <span class="clicky-feed__ago">{{ v.ago }}</span>
+                    <span class="clicky-feed__stats">{{ v.referrerLabel }} · {{ v.actions }} {{ 'views'|t('clicky-analytics') }} · {{ v.duration }}</span>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

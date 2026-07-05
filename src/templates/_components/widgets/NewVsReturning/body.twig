@@ -1,0 +1,11 @@
+{# New vs Returning widget body: counters + a donut. #}
+<div class="clicky-widget {{ clickyUiClass|default('') }}" style="--clicky-accent: {{ accent }}">
+    <div class="clicky-stats clicky-stats--compact">
+        {% include 'clicky-analytics/_components/_statCard' with { label: 'New'|t('clicky-analytics'), metric: { value: data.new } } only %}
+        {% include 'clicky-analytics/_components/_statCard' with { label: 'Returning'|t('clicky-analytics'), metric: { value: data.returning } } only %}
+    </div>
+    {% include 'clicky-analytics/_components/_pieChart' with { rows: [
+        { title: 'New'|t('clicky-analytics'), value: data.new },
+        { title: 'Returning'|t('clicky-analytics'), value: data.returning },
+    ], colors: [accent, secondary] } only %}
+</div>

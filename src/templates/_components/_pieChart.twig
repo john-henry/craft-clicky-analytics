@@ -1,0 +1,36 @@
+{# ============================================================================
+ # Pie chart
+ # A donut pie chart + legend from ranked rows.
+ # Props: rows, colors? (explicit slice colours, else the generic pie palette)
+ # ========================================================================== #}
+{% if rows is empty %}
+    <p class="clicky-muted">{{ 'No data for this period.'|t('clicky-analytics') }}</p>
+{% else %}
+    {% set palette = colors ?? craft.clickyAnalytics.pieColors %}
+    {% set total = 0 %}
+    {% for r in rows %}{% set total = total + (r.value|default(0)) %}{% endfor %}
+    {% set total = total > 0 ? total : 1 %}
+    <div class="clicky-pie">
+        <svg class="clicky-pie__svg" viewBox="0 0 36 36" role="img" aria-label="{{ 'Distribution'|t('clicky-analytics') }}">
+            {% set offset = 0 %}
+            {% for r in rows %}
+                {% set pct = (r.value|default(0)) / total * 100 %}
+                <circle cx="18" cy="18" r="13.5" fill="none"
+                        stroke="{{ palette[loop.index0 % palette|length] }}" stroke-width="7"
+                        pathLength="100" stroke-dasharray="{{ pct|round(2) }} {{ (100 - pct)|round(2) }}"
+                        stroke-dashoffset="{{ (0 - offset)|round(2) }}"
+                        transform="rotate(-90 18 18)"><title>{{ r.title ?? '—' }}: {{ (r.value|default(0))|number }}</title></circle>
+                {% set offset = offset + pct %}
+            {% endfor %}
+        </svg>
+        <ul class="clicky-pie__legend">
+            {% for r in rows %}
+                <li class="clicky-pie__item">
+                    <span class="clicky-pie__dot" style="background: {{ palette[loop.index0 % palette|length] }}"></span>
+                    <span class="clicky-pie__label" title="{{ r.title ?? r.url ?? '—' }}">{{ r.title ?? r.url ?? '—' }}</span>
+                    <span class="clicky-pie__val">{{ (r.value|default(0))|number }} <em>{{ ((r.value|default(0)) / total * 100)|round }}%</em></span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

@@ -1,0 +1,13 @@
+{# ============================================================================
+ # Country drilldown: cities and regions for one country, loaded on demand.
+ # ========================================================================== #}
+<div class="clicky-drill__grid">
+    <div class="clicky-drill__col">
+        <h3 class="clicky-drill__title">{{ 'Regions'|t('clicky-analytics') }}</h3>
+        {% include 'clicky-analytics/_components/_rankedList' with { rows: regions } only %}
+    </div>
+    <div class="clicky-drill__col">
+        <h3 class="clicky-drill__title">{{ 'Cities'|t('clicky-analytics') }}</h3>
+        {% include 'clicky-analytics/_components/_rankedList' with { rows: cities } only %}
+    </div>
+</div>

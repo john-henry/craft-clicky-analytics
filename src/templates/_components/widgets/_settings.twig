@@ -1,0 +1,48 @@
+{# Shared settings UI for date-ranged Clicky widgets. #}
+{% import '_includes/forms' as forms %}
+
+{% set rangeOpts = { '': 'Plugin default'|t('clicky-analytics') }|merge(rangeOptions) %}
+{# Keep a saved-but-now-stale month (e.g. an older YYYY-MM) selectable. #}
+{% if widget.dateRange and rangeOpts[widget.dateRange] is not defined %}
+    {% set rangeOpts = rangeOpts|merge({ (widget.dateRange): widget.dateRange }) %}
+{% endif %}
+
+{{ forms.selectField({
+    label: 'Date range'|t('clicky-analytics'),
+    id: 'dateRange',
+    name: 'dateRange',
+    options: rangeOpts,
+    value: widget.dateRange,
+}) }}
+
+{% if showLimit %}
+    {{ forms.textField({
+        label: 'Rows'|t('clicky-analytics'),
+        instructions: 'How many rows to show.'|t('clicky-analytics'),
+        id: 'limit',
+        name: 'limit',
+        type: 'number',
+        size: 4,
+        value: widget.limit,
+    }) }}
+{% endif %}
+
+{% if showConsolidate is defined and showConsolidate %}
+    {{ forms.lightswitchField({
+        label: 'Consolidate versions'|t('clicky-analytics'),
+        instructions: 'Merge versions into one row each (overrides the plugin default).'|t('clicky-analytics'),
+        id: 'consolidate',
+        name: 'consolidate',
+        on: widget.consolidate,
+    }) }}
+{% endif %}
+
+{% if showDrilldown is defined and showDrilldown %}
+    {{ forms.lightswitchField({
+        label: 'Enable drilldown'|t('clicky-analytics'),
+        instructions: 'Let editors expand a country to see its cities and regions.'|t('clicky-analytics'),
+        id: 'drilldown',
+        name: 'drilldown',
+        on: widget.drilldown,
+    }) }}
+{% endif %}

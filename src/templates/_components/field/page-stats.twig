@@ -1,0 +1,40 @@
+{# ============================================================================
+ # Clicky Analytics page-stats field: analytics for the element's own URL.
+ # ========================================================================== #}
+<div class="clicky-field {{ clickyUiClass|default('') }}" style="--clicky-accent: {{ craft.clickyAnalytics.primaryColor }}">
+    <div class="clicky-field__head">
+        <span class="clicky-field__path">{{ href }}</span>
+        <span class="clicky-panel__period">{{ rangeLabel }}</span>
+    </div>
+
+    {% if showSummary %}
+        <div class="clicky-field__section clicky-stats">
+            {% include 'clicky-analytics/_components/_statCard' with { label: 'Visitors'|t('clicky-analytics'), metric: { value: data.visitors } } only %}
+            {% include 'clicky-analytics/_components/_statCard' with { label: 'Unique'|t('clicky-analytics'), metric: { value: data.unique } } only %}
+            {% include 'clicky-analytics/_components/_statCard' with { label: 'Actions'|t('clicky-analytics'), metric: { value: data.actions } } only %}
+            {% include 'clicky-analytics/_components/_statCard' with { label: 'Bounce'|t('clicky-analytics'), metric: { value: data.bounceRate }, suffix: '%' } only %}
+            {% include 'clicky-analytics/_components/_statCard' with { label: 'Avg. time'|t('clicky-analytics'), metric: { pretty: data.time } } only %}
+        </div>
+    {% endif %}
+
+    {% if showSources or showVisitors %}
+        <div class="clicky-field__section clicky-field__grid">
+            {% if showSources %}
+                <section class="clicky-field__col">
+                    <h3 class="clicky-field__title">{{ 'Traffic sources'|t('clicky-analytics') }}</h3>
+                    {% include 'clicky-analytics/_components/_rankedList' with { rows: data.sources, accent: craft.clickyAnalytics.accent('sources') } only %}
+                </section>
+            {% endif %}
+            {% if showVisitors %}
+                <section class="clicky-field__col">
+                    <h3 class="clicky-field__title">{{ 'Recent visitors'|t('clicky-analytics') }}</h3>
+                    {% if data.visitorsList is not empty %}
+                        {% include 'clicky-analytics/_components/_feed' with { visitors: data.visitorsList } only %}
+                    {% else %}
+                        <p class="clicky-muted">{{ 'No recent visitors.'|t('clicky-analytics') }}</p>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,16 @@
+{# ============================================================================
+ # Stat card
+ # A headline metric: small label, big value, optional coloured trend.
+ # Props: label, metric ({ value, pretty?, trend?, positive?, dir? }), suffix?
+ # ========================================================================== #}
+<div class="clicky-stat">
+    <div class="clicky-stat__label">{{ label }}</div>
+    <div class="clicky-stat__row">
+        <span class="clicky-stat__value">{{ metric.pretty is defined ? metric.pretty : (metric.value|number ~ (suffix|default(''))) }}</span>
+        {% if metric.trend is defined and metric.trend is not null %}
+            <span class="clicky-trend clicky-trend--{{ metric.positive ? 'good' : 'bad' }}">
+                {% include 'clicky-analytics/_components/_icon' with { name: metric.dir == 'up' ? 'arrow-up' : 'arrow-down' } only %}<span class="visually-hidden">{{ metric.dir == 'up' ? 'up'|t('clicky-analytics') : 'down'|t('clicky-analytics') }} </span>{{ metric.trend }}%
+            </span>
+        {% endif %}
+    </div>
+</div>

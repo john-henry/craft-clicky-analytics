@@ -1,0 +1,6 @@
+{# Shown in a widget body when Clicky credentials are missing. #}
+<p class="light">
+    {{ 'Add your Clicky Site ID and Sitekey in'|t('clicky-analytics') }}
+    <a href="{{ url('settings/plugins/clicky-analytics') }}">{{ 'the plugin settings'|t('clicky-analytics') }}</a>.
+</p>
+{% include 'clicky-analytics/_components/_affiliateNotice' only %}

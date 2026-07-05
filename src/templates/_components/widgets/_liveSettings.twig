@@ -1,0 +1,24 @@
+{# Settings UI for the Live Visitors widget. #}
+{% import '_includes/forms' as forms %}
+
+{{ forms.textField({
+    label: 'Rows'|t('clicky-analytics'),
+    instructions: 'How many visitors to show.'|t('clicky-analytics'),
+    id: 'limit',
+    name: 'limit',
+    type: 'number',
+    size: 4,
+    value: widget.limit,
+}) }}
+
+{{ forms.selectField({
+    label: 'Show'|t('clicky-analytics'),
+    id: 'filter',
+    name: 'filter',
+    options: {
+        'all': 'New and returning'|t('clicky-analytics'),
+        'new': 'New only'|t('clicky-analytics'),
+        'returning': 'Returning only'|t('clicky-analytics'),
+    },
+    value: widget.filter,
+}) }}

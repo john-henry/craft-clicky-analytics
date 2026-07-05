@@ -1,0 +1,180 @@
+{# ============================================================================
+ # Clicky Analytics settings
+ # API credentials (env-var aware) plus widget defaults.
+ # ========================================================================== #}
+{% import '_includes/forms' as forms %}
+{% do view.registerAssetBundle('johnhenry\\clickyanalytics\\assetbundles\\ClickyAsset') %}
+
+{% set overrides = overrides ?? [] %}
+{% set overrideWarning = 'This is being overridden by the clicky-analytics.php config file.'|t('clicky-analytics') %}
+
+{% if not settings.siteId %}
+    {% include 'clicky-analytics/_components/_affiliateNotice' only %}
+{% endif %}
+
+{{ forms.autosuggestField({
+    label: 'Site ID'|t('clicky-analytics'),
+    instructions: 'Your Clicky Site ID. Found in Clicky under Preferences → Site → “Site ID & keys”.'|t('clicky-analytics'),
+    id: 'siteId',
+    name: 'siteId',
+    suggestEnvVars: true,
+    value: settings.siteId,
+    required: true,
+    placeholder: '$CLICKY_SITE_ID',
+    disabled: 'siteId' in overrides,
+    warning: 'siteId' in overrides ? overrideWarning,
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Sitekey'|t('clicky-analytics'),
+    instructions: 'Your private Clicky Sitekey. Keep this secret; store it in an environment variable.'|t('clicky-analytics'),
+    id: 'siteKey',
+    name: 'siteKey',
+    suggestEnvVars: true,
+    value: settings.siteKey,
+    required: true,
+    placeholder: '$CLICKY_SITEKEY',
+    disabled: 'siteKey' in overrides,
+    warning: 'siteKey' in overrides ? overrideWarning,
+}) }}
+
+<div class="field">
+    <button type="button" class="btn" data-clicky-test>{{ 'Test connection'|t('clicky-analytics') }}</button>
+    <span class="clicky-test-result" data-clicky-test-result role="status"></span>
+</div>
+
+{% js %}
+(function () {
+    var btn = document.querySelector('[data-clicky-test]');
+    if (!btn) { return; }
+    var out = document.querySelector('[data-clicky-test-result]');
+    var scope = btn.closest('form') || document;
+    function val(suffix) {
+        var el = scope.querySelector('[name$="[' + suffix + ']"], [name="' + suffix + '"]');
+        return el ? el.value : '';
+    }
+    function setResult(message, success) {
+        out.textContent = message;
+        out.classList.toggle('success', success);
+        out.classList.toggle('error', !success);
+    }
+    btn.addEventListener('click', function () {
+        btn.classList.add('loading');
+        out.textContent = '';
+        out.classList.remove('success', 'error');
+        Craft.sendActionRequest('POST', 'clicky-analytics/settings/test', { data: { siteId: val('siteId'), siteKey: val('siteKey') } })
+            .then(function (response) {
+                setResult(response.data.message, response.data.success);
+            })
+            .catch(function (error) {
+                var data = error.response && error.response.data ? error.response.data : {};
+                setResult(data.message || Craft.t('clicky-analytics', 'Request failed.'), false);
+            })
+            .finally(function () {
+                btn.classList.remove('loading');
+            });
+    });
+})();
+{% endjs %}
+
+<hr>
+
+{{ forms.lightswitchField({
+    label: 'Inject tracking code'|t('clicky-analytics'),
+    instructions: 'Add the Clicky tracking snippet to every front-end page automatically, using the Site ID above.'|t('clicky-analytics'),
+    id: 'injectTrackingCode',
+    name: 'injectTrackingCode',
+    on: settings.injectTrackingCode,
+    disabled: 'injectTrackingCode' in overrides,
+    warning: 'injectTrackingCode' in overrides ? overrideWarning,
+}) }}
+
+{# The noscript pixel only ships alongside the injected script tag, so there's
+   no point toggling it while injection is off. Reflects the last saved value,
+   so it settles after a save-and-reload. #}
+{{ forms.lightswitchField({
+    label: 'Track visitors with JavaScript disabled'|t('clicky-analytics'),
+    instructions: 'Include the `<noscript>` pixel fallback alongside the script tag.'|t('clicky-analytics'),
+    id: 'trackNoScript',
+    name: 'trackNoScript',
+    on: settings.trackNoScript,
+    disabled: not settings.injectTrackingCode or 'trackNoScript' in overrides,
+    warning: 'trackNoScript' in overrides ? overrideWarning,
+}) }}
+
+<hr>
+
+{{ forms.selectField({
+    label: 'Default date range'|t('clicky-analytics'),
+    instructions: 'The date range widgets use by default.'|t('clicky-analytics'),
+    id: 'defaultDateRange',
+    name: 'defaultDateRange',
+    options: dateRangeOptions,
+    value: settings.defaultDateRange,
+    disabled: 'defaultDateRange' in overrides,
+    warning: 'defaultDateRange' in overrides ? overrideWarning,
+}) }}
+
+{{ forms.textField({
+    label: 'Cache duration'|t('clicky-analytics'),
+    instructions: 'How long, in seconds, to cache Clicky API responses. Set to 0 to disable caching.'|t('clicky-analytics'),
+    id: 'cacheDuration',
+    name: 'cacheDuration',
+    type: 'number',
+    size: 6,
+    value: settings.cacheDuration,
+    disabled: 'cacheDuration' in overrides,
+    warning: 'cacheDuration' in overrides ? overrideWarning,
+}) }}
+
+<hr>
+
+{% set schemeOverridden = 'colorScheme' in overrides %}
+{% embed '_includes/forms/field.twig' with {
+    id: 'colorScheme',
+    label: 'Colour scheme'|t('clicky-analytics'),
+    instructions: 'The accent colours used across the widgets and the page-stats field.'|t('clicky-analytics'),
+    warning: schemeOverridden ? overrideWarning,
+} %}
+    {% block input %}
+        <div class="clicky-schemes" role="radiogroup" aria-label="{{ 'Colour scheme'|t('clicky-analytics') }}">
+            {% for value, scheme in colorSchemes %}
+                <label class="clicky-scheme">
+                    <input type="radio" name="colorScheme" value="{{ value }}" {{ value == settings.colorScheme ? 'checked' }} {{ schemeOverridden ? 'disabled' }}>
+                    <span class="clicky-scheme__swatches" aria-hidden="true">
+                        {% for color in scheme.colors %}
+                            <span class="clicky-scheme__dot" style="background: {{ color }}"></span>
+                        {% endfor %}
+                    </span>
+                    <span class="clicky-scheme__label">{{ scheme.label }}</span>
+                </label>
+            {% endfor %}
+        </div>
+    {% endblock %}
+{% endembed %}
+
+{{ forms.lightswitchField({
+    label: 'Compact density'|t('clicky-analytics'),
+    instructions: 'Use a more compact layout for the widgets and page-stats field instead of comfortable spacing.'|t('clicky-analytics'),
+    id: 'compactDensity',
+    name: 'compactDensity',
+    on: settings.compactDensity,
+    disabled: 'compactDensity' in overrides,
+    warning: 'compactDensity' in overrides ? overrideWarning,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Slim bar style'|t('clicky-analytics'),
+    instructions: 'Use a slimmer toolbar instead of the full-size bar.'|t('clicky-analytics'),
+    id: 'slimBarStyle',
+    name: 'slimBarStyle',
+    on: settings.slimBarStyle,
+    disabled: 'slimBarStyle' in overrides,
+    warning: 'slimBarStyle' in overrides ? overrideWarning,
+}) }}
+
+<hr>
+
+<p class="light" style="font-size: 12px;">
+    {{ 'Clicky is a trademark of Roxr Software Ltd. This is an unofficial, community plugin.'|t('clicky-analytics') }}
+</p>

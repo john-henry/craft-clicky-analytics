@@ -1,0 +1,854 @@
+/* ============================================================================
+ * Clicky Analytics dashboard & widget styles
+ * Plausible-inspired: stat cards with trends, an area chart, and accent-coloured
+ * top-N panels. Accent colour is supplied per panel via the --clicky-accent
+ * custom property.
+ * ========================================================================== */
+
+/* Density & bar style (settings) ------------------------------------------ */
+
+.clicky--density-compact .clicky-panel {
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+
+.clicky--density-compact .clicky-stats {
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.clicky--density-compact .clicky-grid {
+    gap: 14px;
+}
+
+.clicky--density-compact .clicky-field__section + .clicky-field__section {
+    margin-top: 14px;
+}
+
+.clicky--density-compact .clicky-rank__item {
+    padding: 4px 8px;
+}
+
+.clicky--density-compact .clicky-stat__value {
+    font-size: 24px;
+}
+
+.clicky--bar-slim .clicky-panel__head,
+.clicky--bar-slim .clicky-field__head {
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.clicky--bar-slim .clicky-panel__title {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.clicky--bar-slim .clicky-panel__icon .clicky-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* The full-width grey backdrop track behind a slim-style bar. Rendered for
+   every row regardless of bar style, but only given a visible size/colour
+   under .clicky--bar-slim below, so it has zero effect in the default
+   full-pill style. */
+.clicky-rank__track {
+    display: none;
+}
+
+/* Slim bar style: ranked-list rows drop the full-height accent-tinted pill
+   fill in favour of a slightly taller accent bar sitting on a full-width grey
+   track, anchored to the row's bottom edge, so the row reads as a plain list
+   with a sparkline-style indicator rather than a bar chart. */
+.clicky--bar-slim .clicky-rank__item {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 12px;
+    border-radius: 0;
+}
+
+.clicky--bar-slim .clicky-rank__track {
+    display: block;
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 0;
+    height: 5px;
+    border-radius: 2px;
+    background: var(--gray-100, #e5e8ec);
+}
+
+.clicky--bar-slim .clicky-rank__bar {
+    inset: auto 0 0 0;
+    z-index: 0;
+    height: 5px;
+    border-radius: 2px;
+    /* Inherits the inline rank tint. At this thickness an L90% tint reads
+       faint against the grey track, so nudge it a touch darker to keep the
+       coloured portion legible without changing the underlying colour. */
+    filter: brightness(0.9);
+}
+
+/* Colour-scheme picker (settings) ---------------------------------------- */
+
+.clicky-schemes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.clicky-scheme {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--hairline-color, #e3e5e8);
+    border-radius: 8px;
+    background: var(--white, #fff);
+    cursor: pointer;
+}
+
+.clicky-scheme:hover {
+    border-color: var(--medium-text-color, #7a7f87);
+}
+
+.clicky-scheme:has(input:checked) {
+    border-color: var(--text-color, #3f4d5a);
+    box-shadow: inset 0 0 0 1px var(--text-color, #3f4d5a);
+}
+
+.clicky-scheme:has(input:focus-visible) {
+    box-shadow: 0 0 0 2px var(--clicky-focus, #3f6dd1);
+}
+
+.clicky-scheme input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.clicky-scheme__swatches {
+    display: inline-flex;
+    gap: 2px;
+}
+
+.clicky-scheme__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.clicky-scheme__label {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.clicky-test-result {
+    margin-left: 10px;
+    font-weight: 500;
+}
+
+.clicky-muted {
+    color: var(--medium-text-color, #7a7f87);
+    font-size: 14px;
+    padding: 10px 2px;
+}
+
+.clicky-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: color-mix(in srgb, #e5573f 12%, transparent);
+    color: #b4291a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.clicky-empty {
+    text-align: center;
+    padding: 56px 24px;
+}
+
+.clicky-empty p {
+    margin-bottom: 16px;
+    font-size: 16px;
+    color: var(--medium-text-color, #7a7f87);
+}
+
+.clicky-icon {
+    width: 1.15em;
+    height: 1.15em;
+    vertical-align: -0.2em;
+}
+
+/* Panels ------------------------------------------------------------------ */
+
+.clicky-panel {
+    background: var(--white, #fff);
+    border: 1px solid var(--hairline-color, #e3e5e8);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgba(31, 41, 51, 0.04);
+}
+
+.clicky-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.clicky-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.clicky-panel__head .clicky-panel__title {
+    margin: 0;
+}
+
+.clicky-panel__icon {
+    display: inline-flex;
+    color: var(--clicky-accent, #3b82f6);
+}
+
+.clicky-panel__icon .clicky-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.clicky-panel__period {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--light-text-color, #9aa5b1);
+}
+
+.clicky-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.clicky-grid .clicky-panel {
+    margin-bottom: 0;
+}
+
+/* "Online now" pulsing dot ------------------------------------------------- */
+
+.clicky-now__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1aa658;
+    box-shadow: 0 0 0 0 rgba(26, 166, 88, 0.6);
+    animation: clicky-pulse 2s infinite;
+}
+
+@keyframes clicky-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(26, 166, 88, 0.5); }
+    70% { box-shadow: 0 0 0 7px rgba(26, 166, 88, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(26, 166, 88, 0); }
+}
+
+/* Stat cards -------------------------------------------------------------- */
+
+.clicky-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+.clicky-stats--compact {
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.clicky-stat__label {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--medium-text-color, #7a7f87);
+    margin-bottom: 3px;
+}
+
+.clicky-stat__row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.clicky-stat__value {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.clicky-stats--compact .clicky-stat__value {
+    font-size: 22px;
+}
+
+.clicky-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.clicky-trend__arrow {
+    width: 11px;
+    height: 11px;
+}
+
+/* Darkened from the brand green/orange-red to meet WCAG AA (4.5:1) on white;
+ * the un-darkened tints are still used for backgrounds elsewhere. */
+.clicky-trend--good { color: #15803d; }
+.clicky-trend--bad { color: #c2410c; }
+
+/* Area chart -------------------------------------------------------------- */
+
+.clicky-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.clicky-chart__grid {
+    stroke: var(--hairline-color, #e3e5e8);
+    stroke-width: 1;
+}
+
+.clicky-chart__line {
+    fill: none;
+    stroke: var(--clicky-accent, #3b82f6);
+    stroke-width: 2.5;
+}
+
+.clicky-chart__dot {
+    fill: var(--white, #fff);
+    stroke: var(--clicky-accent, #3b82f6);
+    stroke-width: 2;
+}
+
+.clicky-chart__ylabel {
+    fill: var(--light-text-color, #9aa5b1);
+    font-size: 11px;
+    text-anchor: end;
+}
+
+.clicky-chart__xlabel {
+    fill: var(--light-text-color, #9aa5b1);
+    font-size: 11px;
+}
+
+/* Ranked lists ------------------------------------------------------------ */
+
+.clicky-rank {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.clicky-rank__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.clicky-rank__bar {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 6px;
+    /* Background colour is set inline per row from the scheme's rank tints. */
+}
+
+.clicky-rank__label {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.clicky-rank__label a {
+    color: var(--text-color, #3f4d5a);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.clicky-rank__label a:hover {
+    text-decoration: underline;
+}
+
+.clicky-rank__flag {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.clicky-flag {
+    width: 20px;
+    height: 15px;
+    border-radius: 2px;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.clicky-logo {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    display: block;
+}
+
+.clicky-rank__flag .clicky-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--light-text-color, #9aa5b1);
+}
+
+.clicky-rank__right {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.clicky-rank__value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.clicky-rank__ext {
+    display: inline-flex;
+    color: var(--light-text-color, #9aa5b1);
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.clicky-rank__item:hover .clicky-rank__ext {
+    opacity: 1;
+}
+
+.clicky-rank__ext:hover {
+    color: var(--clicky-accent, #3b82f6);
+}
+
+.clicky-rank__ext .clicky-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* Country drilldown ------------------------------------------------------- */
+
+.clicky-rank--drill .clicky-rank__label {
+    flex: 1 1 auto;
+}
+
+.clicky-rank__toggle {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--light-text-color, #9aa5b1);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.clicky-rank__toggle:hover {
+    color: var(--clicky-accent, #3b82f6);
+    background: color-mix(in srgb, var(--clicky-accent, #3b82f6) 12%, transparent);
+}
+
+.clicky-rank__toggle .clicky-icon {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.15s ease-in-out;
+}
+
+.clicky-rank__item--open .clicky-rank__toggle .clicky-icon {
+    transform: rotate(180deg);
+}
+
+.clicky-drill {
+    list-style: none;
+    padding: 8px 6px 10px 0;
+}
+
+.clicky-drill[hidden] {
+    display: none;
+}
+
+.clicky-drill__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.clicky-drill__title {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--light-text-color, #9aa5b1);
+}
+
+.clicky-drill__empty,
+.clicky-drill__loading {
+    color: var(--light-text-color, #9aa5b1);
+    font-size: 13px;
+    padding: 6px 0;
+}
+
+@media (max-width: 520px) {
+    .clicky-drill__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.clicky-rank__value em {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--light-text-color, #9aa5b1);
+    margin-left: 4px;
+}
+
+/* Widgets ----------------------------------------------------------------- */
+
+.clicky-now {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 2px;
+}
+
+.clicky-now__dot {
+    align-self: center;
+}
+
+.clicky-now__value {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.clicky-now__label {
+    color: var(--medium-text-color, #7a7f87);
+    font-size: 14px;
+}
+
+/* Configurable report widget --------------------------------------------- */
+
+.clicky-counter {
+    padding: 8px 2px;
+}
+
+.clicky-counter__value {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--clicky-accent, #ee5a24);
+}
+
+.clicky-counter__label {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--medium-text-color, #7a7f87);
+}
+
+.clicky-pie {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.clicky-pie__svg {
+    width: 120px;
+    height: 120px;
+    flex: none;
+}
+
+.clicky-pie__legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1 1 160px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.clicky-pie__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.clicky-pie__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex: none;
+}
+
+.clicky-pie__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.clicky-pie__val {
+    margin-left: auto;
+    flex: none;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.clicky-pie__val em {
+    font-style: normal;
+    font-weight: 400;
+    color: var(--light-text-color, #9aa5b1);
+    margin-left: 3px;
+}
+
+/* Page-stats field -------------------------------------------------------- */
+
+.clicky-field__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--hairline-color, #e3e5e8);
+}
+
+.clicky-field__path {
+    font-weight: 600;
+    word-break: break-all;
+}
+
+/* Separate stacked sections (summary / sources+visitors) with a divider. */
+.clicky-field__section + .clicky-field__section {
+    margin-top: 22px;
+    padding-top: 22px;
+    border-top: 1px solid var(--hairline-color, #e3e5e8);
+}
+
+.clicky-field .clicky-stats {
+    gap: 22px;
+}
+
+.clicky-field__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 32px;
+}
+
+.clicky-field__title {
+    margin: 0 0 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--light-text-color, #9aa5b1);
+}
+
+/* Live visitor feed ------------------------------------------------------- */
+
+.clicky-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #157f46;
+}
+
+.clicky-feed {
+    container-type: inline-size;
+    container-name: clicky-feed;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Each row is its own flex container (not a shared grid/subgrid): a row with
+   no browser/OS icons genuinely takes up no space for that gap, rather than
+   reserving a fixed-width column that renders empty. The trade-off, made
+   deliberately: rows no longer share exact column lines, so the time/stats
+   text won't sit at precisely the same horizontal position across rows when
+   some have an icon and others don't - that's the intended result, not a
+   regression, since the point is to close the gap on icon-less rows. */
+.clicky-feed__row {
+    display: flex;
+    align-items: center;
+    gap: 12px 20px;
+    padding: 10px 6px;
+    border-top: 1px solid var(--hairline-color, #e3e5e8);
+    font-size: 13.5px;
+}
+
+.clicky-feed__row:first-child {
+    border-top: none;
+}
+
+.clicky-feed__flag {
+    /* Fixed, never shrinks or grows regardless of row width. */
+    flex: 0 0 26px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.clicky-feed__flag .clicky-flag {
+    width: 22px;
+    height: 16px;
+}
+
+.clicky-feed__who {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.clicky-feed__loc {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.clicky-feed__page {
+    color: var(--medium-text-color, #7a7f87);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.clicky-feed__page a {
+    color: var(--medium-text-color, #7a7f87);
+    text-decoration: none;
+}
+
+.clicky-feed__page a:hover {
+    text-decoration: underline;
+}
+
+.clicky-feed__tech {
+    /* Sized to its own icons, nothing more - and now only rendered at all
+       (see _feed.twig) when there's at least one icon to show, so a row
+       with neither a browser nor an OS logo takes up zero space here
+       instead of reserving a fixed-width gap for nothing. */
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.clicky-feed__meta {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* min-width: 0 lets the nowrap children below actually ellipsis under
+       pressure instead of overflowing past their own box. */
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+}
+
+.clicky-feed__ago {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.clicky-feed__stats {
+    font-size: 11.5px;
+    color: var(--light-text-color, #9aa5b1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.clicky-feed__badge {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.clicky-feed__badge--new {
+    background: color-mix(in srgb, #1aa658 14%, transparent);
+    color: #157f46;
+}
+
+.clicky-feed__badge--returning {
+    background: color-mix(in srgb, #d97706 14%, transparent);
+    color: #b45309;
+}
+
+/* Reacts to the feed list's own rendered width, not the browser viewport;
+   the same markup runs inside a wide dashboard panel, a narrow dashboard
+   widget column, and the narrow entry-edit sidebar field, and only the
+   container query sees which one it's actually in. Flexbox handles the flag
+   staying fixed and the who column shrinking/ellipsizing on its own, so the
+   only thing left to adjust here is hiding the browser/OS icons to save
+   space once the row gets genuinely narrow. */
+@container clicky-feed (max-width: 420px) {
+    .clicky-feed__tech {
+        display: none;
+    }
+}

@@ -1,0 +1,65 @@
+{# ============================================================================
+ # Ranked list
+ # A ranked list of Clicky items, tinted with the panel accent.
+ # Props: rows, accent?, drilldown?, date? (Clicky date for drilldown)
+ # ========================================================================== #}
+{%- set accent = accent ?? '#3b82f6' -%}
+{%- set drilldown = drilldown ?? false -%}
+{%- set listUid = random(100000, 999999) -%}
+{% if rows is empty %}
+    <p class="clicky-muted">{{ 'No data for this period.'|t('clicky-analytics') }}</p>
+{% else %}
+    {% set max = 1 %}
+    {% for row in rows %}{% set max = max(max, row.value|default(0)) %}{% endfor %}
+    {# Row tints are keyed by rank position (1 to 4), not by widget accent.
+       Rows past the 4th reuse the 4th (near-neutral) tint. #}
+    {% set rankBars = craft.clickyAnalytics.rankBarColors %}
+    <ul class="clicky-rank{{ drilldown ? ' clicky-rank--drill' }}" style="--clicky-accent: {{ accent }}">
+        {% for row in rows %}
+            {% set label = row.title ?? row.url ?? '—' %}
+            {% set pct = (row.value|default(0) / max * 100)|round %}
+            {% set canDrill = drilldown and (row.canDrill ?? true) %}
+            {% set panelId = 'clicky-drill-' ~ listUid ~ '-' ~ loop.index0 %}
+            <li class="clicky-rank__item"
+                {%- if canDrill %} data-clicky-drill="{{ label }}" data-clicky-date="{{ date }}" data-clicky-url="{{ actionUrl('clicky-analytics/country') }}"{% endif %}>
+                <span class="clicky-rank__track"></span>
+                <span class="clicky-rank__bar" style="width: {{ pct }}%; background-color: {{ rankBars[min(loop.index0, 3)] }}"></span>
+                {% if canDrill %}<button type="button" class="clicky-rank__toggle" aria-expanded="false" aria-controls="{{ panelId }}" aria-label="{{ 'Show cities and regions'|t('clicky-analytics') }}">{% include 'clicky-analytics/_components/_icon' with { name: 'chevron' } only %}</button>{% endif %}
+                <span class="clicky-rank__label" title="{{ label }}">
+                    {% if row.code is defined %}
+                        <span class="clicky-rank__flag">
+                            {%- if row.code -%}
+                                <img class="clicky-flag" src="{{ craft.clickyAnalytics.assetUrl('flags/' ~ row.code ~ '.svg') }}" alt="" width="20" height="15" loading="lazy">
+                            {%- else -%}
+                                {% include 'clicky-analytics/_components/_icon' with { name: 'globe' } only %}
+                            {%- endif -%}
+                        </span>
+                    {% elseif row.logo is defined %}
+                        <span class="clicky-rank__flag">
+                            {%- if row.logo -%}
+                                <img class="clicky-logo" src="{{ craft.clickyAnalytics.assetUrl(row.logo ~ '.svg') }}" alt="" width="18" height="18" loading="lazy">
+                            {%- else -%}
+                                {% include 'clicky-analytics/_components/_icon' with { name: row.logoFallback|default('window') } only %}
+                            {%- endif -%}
+                        </span>
+                    {% endif %}
+                    {% if row.url is defined and row.url starts with 'http' %}
+                        <a href="{{ row.url }}" target="_blank" rel="noopener">{{ label }}</a>
+                    {% else %}
+                        {{ label }}
+                    {% endif %}
+                </span>
+                <span class="clicky-rank__right">
+                    <span class="clicky-rank__value">
+                        {{ (row.value|default(0))|number }}
+                        {% if row.value_percent is defined %}<em>{{ row.value_percent }}%</em>{% endif %}
+                    </span>
+                    {% if row.stats_url is defined and row.stats_url %}
+                        <a class="clicky-rank__ext" href="{{ row.stats_url }}" target="_blank" rel="noopener" title="{{ 'Open in Clicky'|t('clicky-analytics') }}" aria-label="{{ 'Open in Clicky'|t('clicky-analytics') }}">{% include 'clicky-analytics/_components/_icon' with { name: 'external' } only %}</a>
+                    {% endif %}
+                </span>
+            </li>
+            {% if canDrill %}<li id="{{ panelId }}" class="clicky-drill" data-clicky-drill-panel role="region" aria-label="{{ 'Cities and regions for {label}'|t('clicky-analytics', {label: label}) }}" hidden></li>{% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}

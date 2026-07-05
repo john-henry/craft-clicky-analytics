@@ -1,0 +1,45 @@
+{# Settings UI for the Clicky page-stats field. #}
+{% import '_includes/forms' as forms %}
+
+{{ forms.selectField({
+    label: 'Date range'|t('clicky-analytics'),
+    instructions: 'The period the page stats cover.'|t('clicky-analytics'),
+    id: 'dateRange',
+    name: 'dateRange',
+    options: rangeOptions,
+    value: field.dateRange,
+}) }}
+
+{{ forms.textField({
+    label: 'Recent visitor count'|t('clicky-analytics'),
+    instructions: 'How many recent visitors to list.'|t('clicky-analytics'),
+    id: 'visitorLimit',
+    name: 'visitorLimit',
+    type: 'number',
+    size: 4,
+    value: field.visitorLimit,
+}) }}
+
+<hr>
+
+{{ forms.lightswitchField({
+    label: 'Show summary'|t('clicky-analytics'),
+    instructions: 'The visitors / actions / bounce / time cards.'|t('clicky-analytics'),
+    id: 'showSummary',
+    name: 'showSummary',
+    on: field.showSummary,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Show traffic sources'|t('clicky-analytics'),
+    id: 'showSources',
+    name: 'showSources',
+    on: field.showSources,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Show recent visitors'|t('clicky-analytics'),
+    id: 'showVisitors',
+    name: 'showVisitors',
+    on: field.showVisitors,
+}) }}
