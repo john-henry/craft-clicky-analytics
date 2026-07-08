@@ -676,6 +676,13 @@
     word-break: break-all;
 }
 
+/* Caption under the header noting the ~30-day per-page data window. */
+.clicky-field__note {
+    margin: -12px 0 18px;
+    padding: 0 2px;
+    font-size: 12px;
+}
+
 /* Separate stacked sections (summary / sources+visitors) with a divider. */
 .clicky-field__section + .clicky-field__section {
     margin-top: 22px;

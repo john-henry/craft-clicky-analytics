@@ -101,39 +101,7 @@ class Api extends Component
     {
         $response = $this->_request($types, $date, $params, $bypassCache);
 
-        $results = [];
-        foreach ($types as $type) {
-            $results[$type] = [];
-        }
-
-        foreach ($response as $block) {
-            $type = $block['type'] ?? null;
-            if ($type === null || !isset($results[$type])) {
-                continue;
-            }
-
-            // Without `daily`, there is a single date block; flatten its items.
-            foreach (($block['dates'] ?? []) as $dateBlock) {
-                foreach (($dateBlock['items'] ?? []) as $item) {
-                    // Clicky HTML-encodes titles (e.g. "&amp;"); decode for display.
-                    if (isset($item['title'])) {
-                        $item['title'] = html_entity_decode((string)$item['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                    }
-                    // Referrer/stats URLs are attacker-influenceable (e.g. a
-                    // crafted Referer header) and are rendered into href
-                    // attributes downstream; strip any non-http(s) scheme.
-                    if (isset($item['url'])) {
-                        $item['url'] = self::_safeUrl((string)$item['url']);
-                    }
-                    if (isset($item['stats_url'])) {
-                        $item['stats_url'] = self::_safeUrl((string)$item['stats_url']);
-                    }
-                    $results[$type][] = $item;
-                }
-            }
-        }
-
-        return $results;
+        return $this->_flatten($response, $types);
     }
 
     /**
@@ -151,6 +119,39 @@ class Api extends Component
     {
         $items = $this->getStats([$type], $date, [], $bypassCache)[$type] ?? [];
         return (int)($items[0]['value'] ?? 0);
+    }
+
+    /**
+     * Fetches segmented (filtered) stats: the same tally and ranked report
+     * "segments" as {@see self::getStats()}, but narrowed to a subset of visitors
+     * via filter parameters (e.g. `['href' => '/blog/post']` for a single page).
+     *
+     * Segmentation is the only way to get per-page aggregates. The plain report
+     * types silently ignore filters like `href` and always return site-wide
+     * totals, so a single page's visitors/actions/bounce/time can only be read
+     * through here.
+     *
+     * Note: Clicky retains the detailed data that segmentation reads for a limited
+     * window (around 30 days on standard plans), so a segmented range can come
+     * back shorter than the same range fetched un-segmented.
+     *
+     * @param string[] $segments The report segments to return (e.g. `['visitors', 'actions']`).
+     * @param string $date A Clicky date expression.
+     * @param array $filters The segmentation filters (e.g. `['href' => '/path']`).
+     * @param array $params Extra query parameters (e.g. `['limit' => 10]`).
+     * @return array<string, array<int, array>> Items keyed by segment name.
+     * @throws RuntimeException if the API is misconfigured or returns an error.
+     * @author JohnHenry <info@johnhenry.ie>
+     * @since 1.0.1
+     */
+    public function getSegments(array $segments, string $date, array $filters = [], array $params = []): array
+    {
+        // `segments` names the metrics; the filters (href, country, …) narrow the
+        // visitor set. `segments` is applied last so a stray param can't clobber it.
+        $query = array_merge($filters, $params, ['segments' => implode(',', $segments)]);
+        $response = $this->_request(['segmentation'], $date, $query);
+
+        return $this->_flatten($response, $segments);
     }
 
     /**
@@ -746,10 +747,13 @@ class Api extends Component
      */
     public function getPageStats(string $href, string $date, int $visitorLimit = 5): array
     {
-        $stats = $this->getStats(
+        // Per-page aggregates must go through segmentation; the plain report types
+        // ignore the `href` filter and would return site-wide totals for every page.
+        $stats = $this->getSegments(
             ['visitors', 'visitors-unique', 'actions', 'bounce-rate', 'time-average', 'traffic-sources'],
             $date,
-            ['href' => $href, 'limit' => 10]
+            ['href' => $href],
+            ['limit' => 10]
         );
 
         $items = $visitorLimit > 0
@@ -1018,6 +1022,55 @@ class Api extends Component
         $remainder = $seconds % 60;
 
         return $remainder > 0 ? "{$minutes}m {$remainder}s" : "{$minutes}m";
+    }
+
+    /**
+     * Flattens a raw Clicky response into items keyed by report type, decoding
+     * HTML-encoded titles and stripping unsafe URLs along the way. Shared by
+     * {@see self::getStats()} and {@see self::getSegments()}, whose responses use
+     * the same `[{type, dates:[{items:[…]}]}]` shape.
+     *
+     * @param array $response The decoded Clicky response (a list of type blocks).
+     * @param string[] $keys The report types/segments to collect into the result.
+     * @return array<string, array<int, array>> Items keyed by report type.
+     * @author JohnHenry <info@johnhenry.ie>
+     * @since 1.0.1
+     */
+    private function _flatten(array $response, array $keys): array
+    {
+        $results = [];
+        foreach ($keys as $key) {
+            $results[$key] = [];
+        }
+
+        foreach ($response as $block) {
+            $type = $block['type'] ?? null;
+            if ($type === null || !isset($results[$type])) {
+                continue;
+            }
+
+            // Without `daily`, there is a single date block; flatten its items.
+            foreach (($block['dates'] ?? []) as $dateBlock) {
+                foreach (($dateBlock['items'] ?? []) as $item) {
+                    // Clicky HTML-encodes titles (e.g. "&amp;"); decode for display.
+                    if (isset($item['title'])) {
+                        $item['title'] = html_entity_decode((string)$item['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    }
+                    // Referrer/stats URLs are attacker-influenceable (e.g. a
+                    // crafted Referer header) and are rendered into href
+                    // attributes downstream; strip any non-http(s) scheme.
+                    if (isset($item['url'])) {
+                        $item['url'] = self::_safeUrl((string)$item['url']);
+                    }
+                    if (isset($item['stats_url'])) {
+                        $item['stats_url'] = self::_safeUrl((string)$item['stats_url']);
+                    }
+                    $results[$type][] = $item;
+                }
+            }
+        }
+
+        return $results;
     }
 
     /**
