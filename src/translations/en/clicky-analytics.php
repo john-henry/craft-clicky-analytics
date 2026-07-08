@@ -165,6 +165,7 @@ return [
     'Unique' => 'Unique',
     'Stats will appear here once this entry has a URL.' => 'Stats will appear here once this entry has a URL.',
     'Add your Clicky Site ID and Sitekey in the plugin settings.' => 'Add your Clicky Site ID and Sitekey in the plugin settings.',
+    'Page figures cover about the last 30 days, Clicky’s limit for detailed per-page data.' => 'Page figures cover about the last 30 days, Clicky’s limit for detailed per-page data.',
 
     // Settings screen
     // =========================================================================

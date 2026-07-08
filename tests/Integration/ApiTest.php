@@ -190,6 +190,47 @@ describe('Api::getStats()', function () {
 });
 
 // ---------------------------------------------------------------------------
+// getSegments(): filtered (segmented) stats
+// ---------------------------------------------------------------------------
+
+describe('Api::getSegments()', function () {
+    it('requests type=segmentation with a segments list and keys items by segment', function () {
+        $api = clickyApi();
+
+        // The request is type=segmentation; the segments and filters ride along as
+        // params, so the seeded key must carry href, limit and the segments string.
+        seedClicky(
+            ['segmentation'],
+            'last-7-days',
+            ['href' => '/pricing', 'limit' => 10, 'segments' => 'visitors,traffic-sources'],
+            [
+                clickyBlock('visitors', [['value' => 42]]),
+                clickyBlock('traffic-sources', [['title' => 'Direct', 'value' => 30]]),
+            ]
+        );
+
+        $result = $api->getSegments(['visitors', 'traffic-sources'], 'last-7-days', ['href' => '/pricing'], ['limit' => 10]);
+
+        expect($result['visitors'][0]['value'])->toBe(42);
+        expect($result['traffic-sources'][0]['title'])->toBe('Direct');
+    });
+
+    it('returns an empty array for a requested segment with no block', function () {
+        $api = clickyApi();
+        seedClicky(
+            ['segmentation'],
+            'today',
+            ['href' => '/', 'segments' => 'visitors,actions'],
+            [clickyBlock('visitors', [['value' => 3]])]
+        );
+
+        $result = $api->getSegments(['visitors', 'actions'], 'today', ['href' => '/']);
+
+        expect($result['actions'])->toBeArray()->toBeEmpty();
+    });
+});
+
+// ---------------------------------------------------------------------------
 // getRecentVisitors()
 // ---------------------------------------------------------------------------
 
@@ -496,10 +537,12 @@ describe('Api::getPageStats()', function () {
         $api = clickyApi();
         $href = '/blog/my-post';
 
+        // Per-page aggregates go through the segmentation endpoint (type=segmentation
+        // + segments=…), the only request that honours the href filter.
         seedClicky(
-            ['visitors', 'visitors-unique', 'actions', 'bounce-rate', 'time-average', 'traffic-sources'],
+            ['segmentation'],
             'last-90-days',
-            ['href' => $href, 'limit' => 10],
+            ['href' => $href, 'limit' => 10, 'segments' => 'visitors,visitors-unique,actions,bounce-rate,time-average,traffic-sources'],
             [
                 clickyBlock('visitors', [['value' => 120]]),
                 clickyBlock('visitors-unique', [['value' => 90]]),
@@ -529,9 +572,9 @@ describe('Api::getPageStats()', function () {
         $href = '/about';
 
         seedClicky(
-            ['visitors', 'visitors-unique', 'actions', 'bounce-rate', 'time-average', 'traffic-sources'],
+            ['segmentation'],
             'last-90-days',
-            ['href' => $href, 'limit' => 10],
+            ['href' => $href, 'limit' => 10, 'segments' => 'visitors,visitors-unique,actions,bounce-rate,time-average,traffic-sources'],
             [clickyBlock('visitors', [['value' => 5]])]
         );
 
