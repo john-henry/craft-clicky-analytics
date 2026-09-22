@@ -7,7 +7,7 @@
 /**
  * Clicky Analytics English translations.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 return [
@@ -176,7 +176,7 @@ return [
     'Inject tracking code' => 'Inject tracking code',
     'Add the Clicky tracking snippet to every front-end page automatically, using the Site ID above.' => 'Add the Clicky tracking snippet to every front-end page automatically, using the Site ID above.',
     'Track visitors with JavaScript disabled' => 'Track visitors with JavaScript disabled',
-    'Include the `<noscript>` pixel fallback alongside the script tag.' => 'Include the `<noscript>` pixel fallback alongside the script tag.',
+    'Include the `<noscript>` pixel fallback alongside the script tag. Only applies while the tracking code is being injected.' => 'Include the `<noscript>` pixel fallback alongside the script tag. Only applies while the tracking code is being injected.',
     'Default date range' => 'Default date range',
     'The date range widgets use by default.' => 'The date range widgets use by default.',
     'Cache duration' => 'Cache duration',

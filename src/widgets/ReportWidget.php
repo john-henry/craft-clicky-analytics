@@ -20,7 +20,7 @@ use johnhenry\clickyanalytics\services\Api;
  * which metrics make sense; the widget renders defensively for combinations that
  * don't (e.g. a total shown as a pie falls back to a counter).
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class ReportWidget extends BaseListWidget
@@ -53,7 +53,7 @@ class ReportWidget extends BaseListWidget
      * Returns the available visualisation types.
      *
      * @return array<string, string> The display options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function displayOptions(): array
@@ -70,7 +70,7 @@ class ReportWidget extends BaseListWidget
      * Returns the single-number metrics.
      *
      * @return array<string, string> The total metric options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function totalOptions(): array
@@ -88,7 +88,7 @@ class ReportWidget extends BaseListWidget
      * Returns the ranked-report metrics.
      *
      * @return array<string, string> The report metric options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function reportOptions(): array
@@ -208,7 +208,7 @@ class ReportWidget extends BaseListWidget
      * @param Api $api The API service.
      * @param string $date A Clicky date expression.
      * @return string The formatted value.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _totalValue(Api $api, string $date): string

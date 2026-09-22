@@ -15,7 +15,7 @@ use craft\helpers\Html;
  * an optional `<noscript>` pixel fallback) from a resolved Site ID, matching
  * the markup shown under Clicky → Prefs → Tracking code.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class TrackingCode
@@ -29,7 +29,7 @@ abstract class TrackingCode
      * @param string $siteId The resolved (numeric) Clicky Site ID.
      * @param bool $noScript Whether to include the `<noscript>` pixel fallback.
      * @return string The tracking snippet markup.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function html(string $siteId, bool $noScript): string

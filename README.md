@@ -1,9 +1,11 @@
 [![Stable Version](https://img.shields.io/packagist/v/johnhenry/craft-clicky-analytics?label=stable&style=for-the-badge)]((https://packagist.org/packages/johnhenry/craft-clicky-analytics))
 [![Static Badge](https://img.shields.io/badge/free-plugin?style=for-the-badge&logo=craftcms&logoColor=white&logoSize=auto&label=Craft%20Plugin%20Store&labelColor=%23E5422B)](https://plugins.craftcms.com/clicky-analytics?craft5)
 
-<p align="center" style="margin-top:100px"><img width="120" height="120" alt="clicky-analytics-plugin-icon" src="https://johnhenry.ie/images/plugins/craft-clicky-analytics.svg"></p>
 
-<h1 align="center">Clicky Analytics for Craft CMS</h1>
+
+![Clicky Analytics for Craft CMS](https://johnhenry.ie/images/plugins/promos/clicky-analytics/1.png)
+
+# Clicky Analytics for Craft CMS
 
 
 Brings your [Clicky](https://clicky.com) web analytics straight into the Craft CMS 5 control panel:

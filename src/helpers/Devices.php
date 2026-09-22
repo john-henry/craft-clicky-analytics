@@ -12,7 +12,7 @@ namespace johnhenry\clickyanalytics\helpers;
  * Maps Clicky hardware names (e.g. "Apple iPhone", "Android device") to a
  * device-type icon name (phone / tablet / desktop / device) used by the UI.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class Devices
@@ -25,7 +25,7 @@ abstract class Devices
      *
      * @param string $title The hardware title from Clicky.
      * @return string One of: phone, tablet, desktop, device.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function icon(string $title): string

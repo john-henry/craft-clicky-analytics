@@ -19,7 +19,7 @@ use DateTimeZone;
  * period used for trend comparison. Supports relative presets, recent calendar
  * months, and an arbitrary custom range.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class DateRanges
@@ -40,7 +40,7 @@ abstract class DateRanges
      * static options offered for widget settings and the plugin default.
      *
      * @return array<string, string> The relative date range options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function relativeOptions(): array
@@ -62,7 +62,7 @@ abstract class DateRanges
      * (current month plus the two before it).
      *
      * @return array<string, string> The month options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function months(): array
@@ -83,7 +83,7 @@ abstract class DateRanges
      * months and the custom-range entry) as `value => label` pairs.
      *
      * @return array<string, string> The full set of date range options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function options(): array
@@ -98,7 +98,7 @@ abstract class DateRanges
      * recent months, but no custom range (widgets are persisted, not interactive).
      *
      * @return array<string, string> The widget date range options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function widgetOptions(): array
@@ -111,7 +111,7 @@ abstract class DateRanges
      *
      * @param string|null $value The candidate value.
      * @return bool Whether it is recognised.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function isValid(?string $value): bool
@@ -131,7 +131,7 @@ abstract class DateRanges
      * @param string|null $value The candidate value.
      * @param string $default The fallback value.
      * @return string A recognised range key.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function normalize(?string $value, string $default = self::DEFAULT): string
@@ -151,7 +151,7 @@ abstract class DateRanges
      * @param string|null $start A `Y-m-d` start date (custom ranges only).
      * @param string|null $end A `Y-m-d` end date (custom ranges only).
      * @return array{date: string, previous: string, label: string, start: string, end: string} The resolved range.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function resolve(string $key, ?string $start = null, ?string $end = null): array
@@ -192,7 +192,7 @@ abstract class DateRanges
      * @param string|null $start A custom `Y-m-d` start date.
      * @param string|null $end A custom `Y-m-d` end date.
      * @return array{0: DateTime, 1: DateTime} The start and end bounds.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private static function _bounds(string $key, ?string $start, ?string $end): array
@@ -253,7 +253,7 @@ abstract class DateRanges
      * @param string $start A `Y-m-d` start date.
      * @param string $end A `Y-m-d` end date.
      * @return string The Clicky date expression.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private static function _format(string $start, string $end): string
@@ -265,7 +265,7 @@ abstract class DateRanges
      * Returns the site time zone.
      *
      * @return DateTimeZone The site time zone.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private static function _tz(): DateTimeZone

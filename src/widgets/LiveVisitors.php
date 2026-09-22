@@ -16,7 +16,7 @@ use johnhenry\clickyanalytics\ClickyAnalytics;
  * and dwell time) on the Craft dashboard, with configurable row count and a
  * new / returning / both filter.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class LiveVisitors extends BaseWidget

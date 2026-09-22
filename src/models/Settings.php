@@ -17,7 +17,7 @@ use craft\helpers\App;
  * Sitekey both support environment-variable syntax (e.g. `$CLICKY_SITEKEY`),
  * parsed lazily through the getters so secrets stay out of project config.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class Settings extends Model
@@ -77,7 +77,7 @@ class Settings extends Model
      * @inheritdoc
      *
      * @return array The behavior configurations.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function behaviors(): array
@@ -93,42 +93,42 @@ class Settings extends Model
     /**
      * @inheritdoc
      *
-     * @return array The validation rules.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @return array<int, mixed> The validation rules.
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
-    public function rules(): array
+    protected function defineRules(): array
     {
-        return [
+        return array_merge(parent::defineRules(), [
             [['siteId', 'siteKey'], 'required'],
             [['siteId', 'siteKey', 'defaultDateRange', 'colorScheme'], 'string'],
             [['cacheDuration'], 'integer', 'min' => 0],
             [['injectTrackingCode', 'trackNoScript', 'compactDensity', 'slimBarStyle'], 'boolean'],
-        ];
+        ]);
     }
 
     /**
      * Returns the resolved Site ID, parsing any environment-variable reference.
      *
      * @return string|null The parsed Site ID, or null if unset.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getSiteId(): ?string
     {
-        return App::parseEnv($this->siteId) ?: null;
+        return trim((string)App::parseEnv($this->siteId)) ?: null;
     }
 
     /**
      * Returns the resolved Sitekey, parsing any environment-variable reference.
      *
      * @return string|null The parsed Sitekey, or null if unset.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getSiteKey(): ?string
     {
-        return App::parseEnv($this->siteKey) ?: null;
+        return trim((string)App::parseEnv($this->siteKey)) ?: null;
     }
 
     /**
@@ -136,7 +136,7 @@ class Settings extends Model
      * for the `.clicky-widget` / `.clicky-field` / `.clicky-panel` root elements.
      *
      * @return string The space-separated modifier classes.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getUiModifierClass(): string

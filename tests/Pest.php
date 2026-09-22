@@ -28,3 +28,31 @@ uses(
     TestCase::class,
     RefreshesDatabase::class,
 )->in('Integration');
+
+uses()->beforeEach(function() {
+    // RefreshesDatabase wraps each test in a transaction it rolls back on
+    // teardown, and that binding only engages when the suite is run with
+    // --test-directory. If it ever stops binding, no transaction is open here
+    // and every test would commit to the dev database.
+    if (Craft::$app->getDb()->getTransaction() === null) {
+        throw new RuntimeException(
+            'No open database transaction: RefreshesDatabase did not bind, so tests would '
+            . 'commit to the dev database. Run the suite via `composer test:ca`.'
+        );
+    }
+
+    // The transaction only covers what it can roll back; MySQL commits
+    // implicitly on ALTER TABLE, which a Field factory triggers. So the database
+    // itself has to be the test one. phpunit.xml.dist pins it, and craft-pest
+    // reads that file from the working directory, so running from anywhere but
+    // the repo root leaves the pin unapplied and Craft on the dev database.
+    $database = Craft::$app->getDb()->createCommand('SELECT DATABASE()')->queryScalar();
+
+    if ($database !== 'db_test') {
+        throw new RuntimeException(sprintf(
+            'Refusing to run: connected to database "%s", expected "db_test". Run the suite '
+            . 'from the repo root via `composer test:ca`.',
+            $database,
+        ));
+    }
+})->in('Integration');

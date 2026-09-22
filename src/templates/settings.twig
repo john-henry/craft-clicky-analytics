@@ -1,7 +1,3 @@
-{# ============================================================================
- # Clicky Analytics settings
- # API credentials (env-var aware) plus widget defaults.
- # ========================================================================== #}
 {% import '_includes/forms' as forms %}
 {% do view.registerAssetBundle('johnhenry\\clickyanalytics\\assetbundles\\ClickyAsset') %}
 
@@ -89,12 +85,9 @@
     warning: 'injectTrackingCode' in overrides ? overrideWarning,
 }) }}
 
-{# The noscript pixel only ships alongside the injected script tag, so there's
-   no point toggling it while injection is off. Reflects the last saved value,
-   so it settles after a save-and-reload. #}
 {{ forms.lightswitchField({
     label: 'Track visitors with JavaScript disabled'|t('clicky-analytics'),
-    instructions: 'Include the `<noscript>` pixel fallback alongside the script tag.'|t('clicky-analytics'),
+    instructions: 'Include the `<noscript>` pixel fallback alongside the script tag. Only applies while the tracking code is being injected.'|t('clicky-analytics'),
     id: 'trackNoScript',
     name: 'trackNoScript',
     on: settings.trackNoScript,

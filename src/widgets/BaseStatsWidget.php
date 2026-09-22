@@ -16,7 +16,7 @@ use johnhenry\clickyanalytics\helpers\DateRanges;
  * Adds a per-widget date-range setting (falling back to the plugin default) and
  * the shared settings UI, for widgets whose data is scoped to a period.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class BaseStatsWidget extends BaseWidget
@@ -40,7 +40,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * a line inside the widget body.
      *
      * @return string|null The resolved date range label.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getSubtitle(): ?string
@@ -56,7 +56,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * range is never persisted and reverts to the plugin default on reload.
      *
      * @return string[] The settings attribute names.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function settingsAttributes(): array
@@ -68,7 +68,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * @inheritdoc
      *
      * @return array The validation rules.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function rules(): array
@@ -82,7 +82,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * @inheritdoc
      *
      * @return string|null The widget settings HTML.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getSettingsHtml(): ?string
@@ -104,7 +104,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * falling back to the plugin default.
      *
      * @return array{date: string, previous: string, label: string, start: string, end: string} The resolved range.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     protected function resolved(): array
@@ -117,7 +117,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * Returns the resolved Clicky date for the widget's range.
      *
      * @return string A Clicky date expression.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     protected function resolveRange(): string
@@ -129,7 +129,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * Returns whether the settings UI should expose a row-limit field.
      *
      * @return bool Whether to show the limit field.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     protected function showLimit(): bool
@@ -142,7 +142,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * toggle (for the browser and operating-system widgets).
      *
      * @return bool Whether to show the consolidate toggle.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     protected function showConsolidate(): bool
@@ -155,7 +155,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * countries widget).
      *
      * @return bool Whether to show the drilldown toggle.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     protected function showDrilldown(): bool

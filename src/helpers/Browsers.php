@@ -14,7 +14,7 @@ namespace johnhenry\clickyanalytics\helpers;
  * bundled brand logo (browser-logos), so the UI can show an icon and, when
  * consolidation is enabled, group every version of a browser into one row.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class Browsers
@@ -52,7 +52,7 @@ abstract class Browsers
      *
      * @param string $title The browser title from Clicky.
      * @return array{label: string, slug: string|null} The family label and logo slug (null = no logo).
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function match(string $title): array

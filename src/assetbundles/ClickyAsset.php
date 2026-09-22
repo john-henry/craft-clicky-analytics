@@ -15,7 +15,7 @@ use craft\web\assets\cp\CpAsset;
  * Registers the dashboard's styles and the small script that swaps the dashboard
  * body when the date-range picker changes.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class ClickyAsset extends AssetBundle
@@ -27,7 +27,7 @@ class ClickyAsset extends AssetBundle
      * @inheritdoc
      *
      * @return void
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function init(): void

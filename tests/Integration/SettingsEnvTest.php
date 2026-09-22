@@ -5,7 +5,9 @@
  * through App::parseEnv() and therefore need a Craft application.
  */
 
+use craft\base\Model;
 use johnhenry\clickyanalytics\models\Settings;
+use yii\base\Event;
 
 // ---------------------------------------------------------------------------
 // Literal values
@@ -60,5 +62,36 @@ describe('Settings getters: env resolution', function () {
 
         putenv('CLICKY_TEST_SITEKEY');
         unset($_SERVER['CLICKY_TEST_SITEKEY']);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Settings hygiene
+// ---------------------------------------------------------------------------
+
+describe('Settings model conventions', function() {
+    // rules() bypasses Craft's EVENT_DEFINE_RULES, so a module adding its own
+    // validation to these settings would never be asked.
+    it('declares its rules through defineRules() so the event fires', function() {
+        $fired = false;
+
+        Event::on(Settings::class, Model::EVENT_DEFINE_RULES, function() use (&$fired) {
+            $fired = true;
+        });
+
+        (new Settings())->validate();
+
+        expect($fired)->toBeTrue();
+    });
+
+    // A key pasted into .env picks up a trailing newline easily, and it goes
+    // straight into the Clicky API request.
+    it('trims whitespace off a resolved Site ID and Sitekey', function() {
+        $settings = new Settings();
+        $settings->siteId = "  101  \n";
+        $settings->siteKey = "\tabc123\n";
+
+        expect($settings->getSiteId())->toBe('101')
+            ->and($settings->getSiteKey())->toBe('abc123');
     });
 });

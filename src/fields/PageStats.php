@@ -22,7 +22,7 @@ use Throwable;
  * recent visitors. It stores no data of its own (the value is always derived
  * live from the element's URL).
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class PageStats extends Field
@@ -126,7 +126,7 @@ class PageStats extends Field
      *
      * @param ElementInterface|null $element The element being edited.
      * @return string The rendered HTML.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _render(?ElementInterface $element): string

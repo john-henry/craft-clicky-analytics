@@ -15,7 +15,7 @@ use johnhenry\clickyanalytics\helpers\Palette;
  *
  * Shows the top screen resolutions for the widget's date range.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class ScreenResolutions extends BaseListWidget

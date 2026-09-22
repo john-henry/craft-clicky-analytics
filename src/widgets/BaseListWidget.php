@@ -12,7 +12,7 @@ namespace johnhenry\clickyanalytics\widgets;
  * Extends the date-ranged widget with a configurable row limit, for the "top N"
  * widgets (pages, sources, countries, browsers).
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class BaseListWidget extends BaseStatsWidget
@@ -36,7 +36,7 @@ abstract class BaseListWidget extends BaseStatsWidget
      * never persisted and reverts to its default on reload.
      *
      * @return string[] The settings attribute names.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function settingsAttributes(): array
@@ -48,7 +48,7 @@ abstract class BaseListWidget extends BaseStatsWidget
      * @inheritdoc
      *
      * @return array The validation rules.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function rules(): array
@@ -65,7 +65,7 @@ abstract class BaseListWidget extends BaseStatsWidget
      * @inheritdoc
      *
      * @return bool Whether to show the limit field.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     protected function showLimit(): bool

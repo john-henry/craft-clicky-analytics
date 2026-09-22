@@ -16,7 +16,7 @@ use johnhenry\clickyanalytics\helpers\Palette;
  * Shows the headline tallies (visitors, actions, bounce rate, average time) for
  * the widget's date range, with a visitors-over-time sparkline.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class Overview extends BaseStatsWidget

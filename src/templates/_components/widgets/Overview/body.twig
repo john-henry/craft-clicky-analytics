@@ -1,4 +1,3 @@
-{# Overview widget body: headline metrics with trends + a visitors area chart. #}
 <div class="clicky-widget {{ clickyUiClass|default('') }}" style="--clicky-accent: {{ accent }}; --clicky-soft: {{ soft }}">
     <div class="clicky-stats clicky-stats--compact">
         {% include 'clicky-analytics/_components/_statCard' with { label: 'Visitors'|t('clicky-analytics'), metric: overview.visitors } only %}
