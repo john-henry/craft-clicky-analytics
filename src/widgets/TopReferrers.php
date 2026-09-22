@@ -15,7 +15,7 @@ use johnhenry\clickyanalytics\helpers\Palette;
  *
  * Shows the top referring domains (external links) for the widget's date range.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class TopReferrers extends BaseListWidget

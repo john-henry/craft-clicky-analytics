@@ -14,7 +14,7 @@ namespace johnhenry\clickyanalytics\helpers;
  * UI can show an icon and, when consolidation is enabled, group every version of
  * an OS into one row.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class OperatingSystems
@@ -54,7 +54,7 @@ abstract class OperatingSystems
      *
      * @param string $title The OS title from Clicky.
      * @return array{label: string, slug: string|null} The family label and logo slug (null = no logo).
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function match(string $title): array

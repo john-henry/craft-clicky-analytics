@@ -15,7 +15,7 @@ use johnhenry\clickyanalytics\helpers\Palette;
  *
  * Shows the top downloads for the widget's date range.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class Downloads extends BaseListWidget

@@ -18,7 +18,7 @@ use yii\web\Response;
  * entered Site ID / Sitekey (resolving any environment variables) against the
  * live Clicky API.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class SettingsController extends Controller
@@ -38,7 +38,7 @@ class SettingsController extends Controller
      * Tests the submitted Clicky credentials.
      *
      * @return Response The JSON test outcome.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function actionTest(): Response

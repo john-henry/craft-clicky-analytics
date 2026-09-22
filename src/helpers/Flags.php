@@ -14,7 +14,7 @@ namespace johnhenry\clickyanalytics\helpers;
  * code resolves to a bundled flag SVG (flag-icons); unknown countries return null
  * and the UI shows a globe instead.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class Flags
@@ -116,7 +116,7 @@ abstract class Flags
      *
      * @param string $country The country name from Clicky.
      * @return string|null The lower-case ISO code, or null if unknown.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function code(string $country): ?string

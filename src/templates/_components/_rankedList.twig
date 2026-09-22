@@ -1,8 +1,3 @@
-{# ============================================================================
- # Ranked list
- # A ranked list of Clicky items, tinted with the panel accent.
- # Props: rows, accent?, drilldown?, date? (Clicky date for drilldown)
- # ========================================================================== #}
 {%- set accent = accent ?? '#3b82f6' -%}
 {%- set drilldown = drilldown ?? false -%}
 {%- set listUid = random(100000, 999999) -%}
@@ -11,8 +6,6 @@
 {% else %}
     {% set max = 1 %}
     {% for row in rows %}{% set max = max(max, row.value|default(0)) %}{% endfor %}
-    {# Row tints are keyed by rank position (1 to 4), not by widget accent.
-       Rows past the 4th reuse the 4th (near-neutral) tint. #}
     {% set rankBars = craft.clickyAnalytics.rankBarColors %}
     <ul class="clicky-rank{{ drilldown ? ' clicky-rank--drill' }}" style="--clicky-accent: {{ accent }}">
         {% for row in rows %}

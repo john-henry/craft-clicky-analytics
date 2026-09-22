@@ -14,7 +14,7 @@ use johnhenry\clickyanalytics\ClickyAnalytics;
  *
  * Shows the number of visitors currently online, per Clicky's real-time tally.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class CurrentVisitors extends BaseWidget

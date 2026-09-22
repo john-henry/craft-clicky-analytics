@@ -2,7 +2,7 @@
   "name": "johnhenry/craft-clicky-analytics",
   "description": "Clicky web analytics for Craft CMS: native dashboard widgets and a per-entry page-stats field, with a live visitor feed, country drilldown and themeable colour schemes, powered by the Clicky API.",
   "type": "craft-plugin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "keywords": [
     "craft",
     "cms",
@@ -32,7 +32,8 @@
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",
-    "craftcms/phpstan": "dev-main"
+    "craftcms/phpstan": "dev-main",
+    "phpstan/phpstan": "^2.2"
   },
   "minimum-stability": "stable",
   "prefer-stable": true,

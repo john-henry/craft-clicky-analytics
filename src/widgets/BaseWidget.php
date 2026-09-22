@@ -20,7 +20,7 @@ use Throwable;
  * data, and fall back to an error notice if the API call fails. Subclasses just
  * declare their body template and supply the data.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class BaseWidget extends Widget
@@ -32,7 +32,7 @@ abstract class BaseWidget extends Widget
      * @inheritdoc
      *
      * @return string|null The widget icon path.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function icon(): ?string
@@ -47,7 +47,7 @@ abstract class BaseWidget extends Widget
      * these widgets (admins always may).
      *
      * @return bool Whether the widget can be selected.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function isSelectable(): bool
@@ -63,7 +63,7 @@ abstract class BaseWidget extends Widget
      * @inheritdoc
      *
      * @return string|null The widget body HTML.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getBodyHtml(): ?string
@@ -96,7 +96,7 @@ abstract class BaseWidget extends Widget
      * Returns the path to the widget's body template.
      *
      * @return string The template path.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     abstract protected function bodyTemplate(): string;
@@ -105,7 +105,7 @@ abstract class BaseWidget extends Widget
      * Returns the variables passed to the widget's body template.
      *
      * @return array The template variables.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     abstract protected function bodyData(): array;

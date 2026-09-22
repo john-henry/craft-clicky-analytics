@@ -29,7 +29,7 @@ use RuntimeException;
  * it (overview, top pages, …) are what the dashboard, widgets and Twig variable
  * consume.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class Api extends Component
@@ -63,7 +63,7 @@ class Api extends Component
      *
      * @param Client|null $client The client to use, or null to restore the default.
      * @return void
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function setHttpClient(?Client $client): void
@@ -75,7 +75,7 @@ class Api extends Component
      * Returns whether the plugin has both a Site ID and a Sitekey configured.
      *
      * @return bool Whether the API is configured.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function isConfigured(): bool
@@ -94,7 +94,7 @@ class Api extends Component
      * @param bool $bypassCache Whether to skip the response cache and always fetch fresh (used for the real-time online-visitor tally).
      * @return array<string, array<int, array>> Items keyed by report type.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getStats(array $types, string $date, array $params = [], bool $bypassCache = false): array
@@ -112,7 +112,7 @@ class Api extends Component
      * @param bool $bypassCache Whether to skip the response cache and always fetch fresh.
      * @return int The tally value (0 if absent).
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTally(string $type, string $date, bool $bypassCache = false): int
@@ -141,7 +141,7 @@ class Api extends Component
      * @param array $params Extra query parameters (e.g. `['limit' => 10]`).
      * @return array<string, array<int, array>> Items keyed by segment name.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.1
      */
     public function getSegments(array $segments, string $date, array $filters = [], array $params = []): array
@@ -162,7 +162,7 @@ class Api extends Component
      *
      * @return int The online visitor count.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getVisitorsOnline(): int
@@ -176,7 +176,7 @@ class Api extends Component
      * @param string $date A Clicky date expression.
      * @return array{new: int, returning: int, total: int} The visitor split.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getNewVsReturning(string $date): array
@@ -202,7 +202,7 @@ class Api extends Component
      * @param string|null $previousDate A Clicky date expression for the prior period (for trends).
      * @return array<string, array> The overview metrics, keyed visitors/actions/bounceRate/time.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getOverview(string $date, ?string $previousDate = null): array
@@ -240,7 +240,7 @@ class Api extends Component
      * @param string $date A Clicky date expression spanning multiple days.
      * @return array<int, array{date: string, value: int}> The daily series, oldest first.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getDailySeries(string $type, string $date): array
@@ -272,7 +272,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked page items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopPages(string $date, int $limit = 10): array
@@ -287,7 +287,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked traffic-source items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopSources(string $date, int $limit = 10): array
@@ -302,7 +302,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked referrer items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopReferrers(string $date, int $limit = 10): array
@@ -318,7 +318,7 @@ class Api extends Component
      * @param bool $withDrilldown Whether to flag rows that have city/region data (`canDrill`).
      * @return array<int, array> The ranked country items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopCountries(string $date, int $limit = 10, bool $withDrilldown = false): array
@@ -347,7 +347,7 @@ class Api extends Component
      * @param bool|null $consolidate Whether to merge versions; null consolidates by default.
      * @return array<int, array> The ranked browser items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopBrowsers(string $date, int $limit = 10, ?bool $consolidate = null): array
@@ -384,7 +384,7 @@ class Api extends Component
      * @param bool|null $consolidate Whether to merge versions; null consolidates by default.
      * @return array<int, array> The ranked operating-system items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopOperatingSystems(string $date, int $limit = 10, ?bool $consolidate = null): array
@@ -419,7 +419,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked search-engine items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopSearchEngines(string $date, int $limit = 10): array
@@ -450,7 +450,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked device items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopDevices(string $date, int $limit = 10): array
@@ -473,7 +473,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked entrance-page items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getEntryPages(string $date, int $limit = 10): array
@@ -488,7 +488,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked exit-page items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getExitPages(string $date, int $limit = 10): array
@@ -503,7 +503,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked download items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopDownloads(string $date, int $limit = 10): array
@@ -518,7 +518,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked goal items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopGoals(string $date, int $limit = 10): array
@@ -533,7 +533,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked campaign items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopCampaigns(string $date, int $limit = 10): array
@@ -548,7 +548,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked screen-resolution items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopScreenResolutions(string $date, int $limit = 10): array
@@ -563,7 +563,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked city items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopCities(string $date, int $limit = 10): array
@@ -578,7 +578,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked region items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getTopRegions(string $date, int $limit = 10): array
@@ -596,7 +596,7 @@ class Api extends Component
      * @param int $limit The maximum rows per breakdown.
      * @return array{cities: array<int, array>, regions: array<int, array>} The breakdown.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getCountryBreakdown(string $country, string $date, int $limit = 5): array
@@ -618,7 +618,7 @@ class Api extends Component
      * @param string $date A Clicky date expression.
      * @return array<string, bool> A lookup keyed by normalised country name.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getCountriesWithBreakdown(string $date): array
@@ -647,7 +647,7 @@ class Api extends Component
      * @param int $limit The maximum number of rows.
      * @return array<int, array> The ranked items.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getReport(string $type, string $date, int $limit = 10): array
@@ -680,7 +680,7 @@ class Api extends Component
      * @param string $siteId The Clicky Site ID to test.
      * @param string $siteKey The Clicky Sitekey to test.
      * @return array{success: bool, message: string} The test outcome.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function ping(string $siteId, string $siteKey): array
@@ -702,7 +702,7 @@ class Api extends Component
             ]);
             $data = Json::decodeIfJson((string)$response->getBody());
         } catch (GuzzleException $e) {
-            return ['success' => false, 'message' => Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => $e->getMessage()])];
+            return ['success' => false, 'message' => Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => self::_redactSitekey($e->getMessage())])];
         }
 
         if (!is_array($data)) {
@@ -724,7 +724,7 @@ class Api extends Component
      * @param int $limit The maximum number of visitors.
      * @return array<int, array> The recent-visitor rows, newest first.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getRecentVisitors(string $date = 'last-7-days', int $limit = 12): array
@@ -742,7 +742,7 @@ class Api extends Component
      * @param int $visitorLimit The maximum recent visitors to include.
      * @return array The page stats payload.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getPageStats(string $href, string $date, int $visitorLimit = 5): array
@@ -781,9 +781,27 @@ class Api extends Component
      * otherwise a real Guzzle client configured per Craft's conventions.
      *
      * @return Client The HTTP client.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
+    /**
+     * Takes the sitekey out of a Guzzle error message.
+     *
+     * Guzzle puts the whole request URI in the message for any HTTP status
+     * error, and the sitekey rides on every call as a query parameter, so the
+     * raw message is the credential in plain text. It would otherwise go to the
+     * log, and for the connection test back to the browser.
+     *
+     * @param string $message The raw error message.
+     * @return string The message with any sitekey value masked.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.2
+     */
+    private static function _redactSitekey(string $message): string
+    {
+        return preg_replace('/\bsitekey=[^&\s`\'"]+/i', 'sitekey=***', $message) ?? $message;
+    }
+
     private function _client(): Client
     {
         return $this->_httpClient ?? Craft::createGuzzleClient();
@@ -795,7 +813,7 @@ class Api extends Component
      *
      * @param array<int, array> $items The raw visitors-list items.
      * @return array<int, array> The normalised visitor rows.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _normalizeVisitors(array $items): array
@@ -845,7 +863,7 @@ class Api extends Component
      *
      * @param string $url The raw URL from the Clicky API.
      * @return string|null The URL if it is a safe http(s) URL, or null.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private static function _safeUrl(string $url): ?string
@@ -864,7 +882,7 @@ class Api extends Component
      *
      * @param int $timestamp The Unix timestamp.
      * @return string The relative time (e.g. "5m ago").
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _ago(int $timestamp): string
@@ -892,7 +910,7 @@ class Api extends Component
      * @param array<int, array> $rows The raw ranked items from Clicky.
      * @param callable(string): string $labelFn Maps a row title to its family label.
      * @return array<int, array> The consolidated, sorted items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _consolidate(array $rows, callable $labelFn): array
@@ -933,7 +951,7 @@ class Api extends Component
      * @param string $country The target country name.
      * @param int $limit The maximum rows to return.
      * @return array<int, array> The filtered rows, country suffix stripped.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _filterByCountry(array $rows, string $country, int $limit): array
@@ -969,7 +987,7 @@ class Api extends Component
      *
      * @param string $name The country name.
      * @return string The normalised key.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _countryKey(string $name): string
@@ -984,7 +1002,7 @@ class Api extends Component
      * @param int|null $previous The prior-period value, or null for no comparison.
      * @param bool $higherIsBetter Whether a higher value is a good thing (for colouring).
      * @return array{value: int, trend: int|null, dir: string|null, positive: bool|null} The metric.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _metric(int $value, ?int $previous, bool $higherIsBetter): array
@@ -1009,7 +1027,7 @@ class Api extends Component
      *
      * @param int $seconds The duration in seconds.
      * @return string The formatted duration.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _prettyTime(int $seconds): string
@@ -1033,7 +1051,7 @@ class Api extends Component
      * @param array $response The decoded Clicky response (a list of type blocks).
      * @param string[] $keys The report types/segments to collect into the result.
      * @return array<string, array<int, array>> Items keyed by report type.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.1
      */
     private function _flatten(array $response, array $keys): array
@@ -1082,7 +1100,7 @@ class Api extends Component
      * @param bool $bypassCache Whether to skip the cache read/write entirely and always fetch fresh.
      * @return array The decoded JSON response.
      * @throws RuntimeException if the API is misconfigured or returns an error.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private function _request(array $types, string $date, array $params = [], bool $bypassCache = false): array
@@ -1122,8 +1140,9 @@ class Api extends Component
             $response = $this->_client()->get(self::ENDPOINT, ['query' => $query]);
             $body = (string)$response->getBody();
         } catch (GuzzleException $e) {
-            Craft::error('Clicky API request failed: ' . $e->getMessage(), 'clicky-analytics');
-            throw new RuntimeException(Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => $e->getMessage()]), 0, $e);
+            $message = self::_redactSitekey($e->getMessage());
+            Craft::error('Clicky API request failed: ' . $message, 'clicky-analytics');
+            throw new RuntimeException(Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => $message]), 0, $e);
         }
 
         $data = Json::decodeIfJson($body);

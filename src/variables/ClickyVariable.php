@@ -16,7 +16,7 @@ use johnhenry\clickyanalytics\helpers\Palette;
  * Exposes the Clicky API service to templates as `craft.clickyAnalytics.*`, so front-end
  * or CP templates can read live analytics without touching the service directly.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class ClickyVariable
@@ -28,7 +28,7 @@ class ClickyVariable
      * Returns the primary accent colour for the current colour scheme.
      *
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getPrimaryColor(): string
@@ -41,7 +41,7 @@ class ClickyVariable
      *
      * @param string $role A role key (e.g. `sources`).
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function accent(string $role): string
@@ -53,7 +53,7 @@ class ClickyVariable
      * Returns the pie-slice colours for the current colour scheme.
      *
      * @return string[] The pie palette.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getPieColors(): array
@@ -65,7 +65,7 @@ class ClickyVariable
      * Returns the secondary accent colour for the current colour scheme.
      *
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getSecondaryColor(): string
@@ -77,7 +77,7 @@ class ClickyVariable
      * Returns the soft area-fill colour for the current colour scheme.
      *
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getSoftFillColor(): string
@@ -88,8 +88,12 @@ class ClickyVariable
     /**
      * Returns the four ranked-list row tints (rank 1 to 4) for the current scheme.
      *
+     * Keyed by rank position, not by the widget's accent colour, so the first
+     * row reads the same wherever it appears. A list longer than four rows
+     * reuses the fourth, which is near neutral.
+     *
      * @return string[] The four rank tints.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getRankBarColors(): array
@@ -103,7 +107,7 @@ class ClickyVariable
      *
      * @param string $path The path within the dist directory.
      * @return string The published URL.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function assetUrl(string $path = ''): string
@@ -118,7 +122,7 @@ class ClickyVariable
      * Returns whether Clicky credentials are configured.
      *
      * @return bool Whether the API is configured.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function isConfigured(): bool
@@ -130,7 +134,7 @@ class ClickyVariable
      * Returns the number of visitors currently online.
      *
      * @return int The online visitor count.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function getVisitorsOnline(): int
@@ -143,7 +147,7 @@ class ClickyVariable
      *
      * @param string $date A Clicky date expression.
      * @return array The overview tallies.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function overview(string $date = 'last-7-days'): array
@@ -157,7 +161,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked page items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topPages(string $date = 'last-7-days', int $limit = 10): array
@@ -171,7 +175,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked traffic-source items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topSources(string $date = 'last-7-days', int $limit = 10): array
@@ -185,7 +189,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked referrer items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topReferrers(string $date = 'last-7-days', int $limit = 10): array
@@ -199,7 +203,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked search-engine items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topSearchEngines(string $date = 'last-7-days', int $limit = 10): array
@@ -213,7 +217,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked operating-system items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topOperatingSystems(string $date = 'last-7-days', int $limit = 10): array
@@ -227,7 +231,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked country items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topCountries(string $date = 'last-7-days', int $limit = 10): array
@@ -241,7 +245,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked device items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topDevices(string $date = 'last-7-days', int $limit = 10): array
@@ -255,7 +259,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked entry-page items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function entryPages(string $date = 'last-7-days', int $limit = 10): array
@@ -269,7 +273,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked exit-page items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function exitPages(string $date = 'last-7-days', int $limit = 10): array
@@ -283,7 +287,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked download items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topDownloads(string $date = 'last-7-days', int $limit = 10): array
@@ -297,7 +301,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked goal items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topGoals(string $date = 'last-7-days', int $limit = 10): array
@@ -311,7 +315,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked campaign items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topCampaigns(string $date = 'last-7-days', int $limit = 10): array
@@ -326,7 +330,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $visitorLimit The maximum recent visitors to include.
      * @return array The page stats payload.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function pageStats(string $href, string $date = 'last-90-days', int $visitorLimit = 5): array
@@ -340,7 +344,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked city items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topCities(string $date = 'last-7-days', int $limit = 10): array
@@ -354,7 +358,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked region items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topRegions(string $date = 'last-7-days', int $limit = 10): array
@@ -368,7 +372,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked screen-resolution items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topScreenResolutions(string $date = 'last-7-days', int $limit = 10): array
@@ -382,7 +386,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of visitors.
      * @return array The recent-visitor rows.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function recentVisitors(string $date = 'last-7-days', int $limit = 12): array
@@ -396,7 +400,7 @@ class ClickyVariable
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of rows.
      * @return array The ranked browser items.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function topBrowsers(string $date = 'last-7-days', int $limit = 10): array

@@ -18,7 +18,7 @@ use yii\web\Response;
  * Serves the cities/regions breakdown for a country as a rendered HTML partial,
  * backing the Top Countries widget's drilldown.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class CountryController extends Controller
@@ -38,7 +38,7 @@ class CountryController extends Controller
      * Returns the cities and regions breakdown for a country.
      *
      * @return Response The JSON response carrying the rendered HTML.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public function actionIndex(): Response

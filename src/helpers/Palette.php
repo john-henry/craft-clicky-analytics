@@ -16,7 +16,7 @@ use johnhenry\clickyanalytics\ClickyAnalytics;
  * chosen in the plugin settings, so the whole plugin can be re-themed at once
  * while each widget keeps its own distinct accent within the scheme's family.
  *
- * @author JohnHenry <info@johnhenry.ie>
+ * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class Palette
@@ -105,7 +105,7 @@ abstract class Palette
      * Returns the available colour schemes as `value => label` pairs.
      *
      * @return array<string, string> The scheme options.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function schemes(): array
@@ -124,7 +124,7 @@ abstract class Palette
      * picker: `key => { label, colors }`.
      *
      * @return array<string, array{label: string, colors: string[]}> The schemes with swatches.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function swatches(): array
@@ -148,7 +148,7 @@ abstract class Palette
      * Returns the primary/brand accent for the current scheme (chart, counters).
      *
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function primary(): string
@@ -161,7 +161,7 @@ abstract class Palette
      *
      * @param string $role A role key (e.g. `pages`, `browsers`).
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function accent(string $role): string
@@ -180,7 +180,7 @@ abstract class Palette
      * Returns the pie-slice colours for the current scheme.
      *
      * @return string[] The pie palette.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function pie(): array
@@ -193,7 +193,7 @@ abstract class Palette
      * slice). Fill-only: fine at 12px+ bold, not safe as small or fine text.
      *
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function secondary(): string
@@ -206,7 +206,7 @@ abstract class Palette
      * A light pastel meant to be used near-solid, not as a faint accent tint.
      *
      * @return string A hex colour.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function soft(): string
@@ -220,7 +220,7 @@ abstract class Palette
      * (near-neutral) tint.
      *
      * @return string[] The four rank tints.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function bars(): array
@@ -235,7 +235,7 @@ abstract class Palette
      * Returns the current (validated) scheme key from the plugin settings.
      *
      * @return string The scheme key.
-     * @author JohnHenry <info@johnhenry.ie>
+     * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     private static function _current(): string

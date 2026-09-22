@@ -1,8 +1,6 @@
-{# Shared settings UI for date-ranged Clicky widgets. #}
 {% import '_includes/forms' as forms %}
 
 {% set rangeOpts = { '': 'Plugin default'|t('clicky-analytics') }|merge(rangeOptions) %}
-{# Keep a saved-but-now-stale month (e.g. an older YYYY-MM) selectable. #}
 {% if widget.dateRange and rangeOpts[widget.dateRange] is not defined %}
     {% set rangeOpts = rangeOpts|merge({ (widget.dateRange): widget.dateRange }) %}
 {% endif %}
