@@ -45,15 +45,26 @@ class CountryController extends Controller
     {
         $this->requireCpRequest();
         $this->requireAcceptsJson();
-        $this->requirePermission('clicky-analytics:addWidgets');
+        $this->requirePermission(ClickyAnalytics::PERMISSION_VIEW_ANALYTICS);
 
-        // Country names are short; cap the input so a malformed request can't
-        // bloat the two cached report fetches it feeds into.
+        // Country names are short; anything longer can't match a report row.
         $country = substr((string)$this->request->getRequiredParam('country'), 0, 100);
-        $date = (string)$this->request->getParam('date') ?: DateRanges::resolve(DateRanges::DEFAULT)['date'];
+
+        // The date goes to Clicky and into the cache key, so only a date
+        // Clicky understands is let through.
+        $date = (string)$this->request->getParam('date');
+        if (!DateRanges::isClickyDate($date)) {
+            $date = DateRanges::resolve(DateRanges::DEFAULT)['date'];
+        }
+
+        $site = $this->request->getParam('site');
+        $plugin = ClickyAnalytics::getInstance();
+        if (!in_array($site, $plugin->getSettings()->getSiteHandlesWithOwnCredentials(), true)) {
+            $site = null;
+        }
 
         try {
-            $breakdown = ClickyAnalytics::getInstance()->getApi()->getCountryBreakdown($country, $date);
+            $breakdown = $plugin->getApi()->forSite($site)->getCountryBreakdown($country, $date);
         } catch (Throwable) {
             $breakdown = ['cities' => [], 'regions' => []];
         }

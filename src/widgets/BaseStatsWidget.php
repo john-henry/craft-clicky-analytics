@@ -25,6 +25,27 @@ abstract class BaseStatsWidget extends BaseWidget
     // =========================================================================
 
     /**
+     * @inheritdoc
+     *
+     * @return string|null The widget settings HTML.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    public function getSettingsHtml(): ?string
+    {
+        return Craft::$app->getView()->renderTemplate('clicky-analytics/_components/widgets/_settings', [
+            'widget' => $this,
+            'rangeOptions' => DateRanges::widgetOptions(),
+            'showLimit' => $this->showLimit(),
+            'showConsolidate' => $this->showConsolidate(),
+            'showDrilldown' => $this->showDrilldown(),
+        ]);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
      * @var string|null The widget's date range; null uses the plugin default.
      */
     public ?string $dateRange = null;
@@ -71,33 +92,12 @@ abstract class BaseStatsWidget extends BaseWidget
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
-    public function rules(): array
+    protected function defineRules(): array
     {
-        $rules = parent::rules();
+        $rules = parent::defineRules();
         $rules[] = [['dateRange'], 'string'];
         return $rules;
     }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string|null The widget settings HTML.
-     * @author John Henry Donovan <info@johnhenry.ie>
-     * @since 1.0.0
-     */
-    public function getSettingsHtml(): ?string
-    {
-        return Craft::$app->getView()->renderTemplate('clicky-analytics/_components/widgets/_settings', [
-            'widget' => $this,
-            'rangeOptions' => DateRanges::widgetOptions(),
-            'showLimit' => $this->showLimit(),
-            'showConsolidate' => $this->showConsolidate(),
-            'showDrilldown' => $this->showDrilldown(),
-        ]);
-    }
-
-    // Protected Methods
-    // =========================================================================
 
     /**
      * Resolves the widget's date range (key + comparison period + Clicky dates),

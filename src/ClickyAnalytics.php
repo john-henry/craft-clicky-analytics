@@ -36,6 +36,15 @@ class ClickyAnalytics extends BasePlugin
 
     use PluginTrait;
 
+    // Const Properties
+    // =========================================================================
+
+    /**
+     * @var string The permission to see Clicky data: the dashboard widgets, the
+     * Page Stats field and the country drilldown.
+     */
+    public const PERMISSION_VIEW_ANALYTICS = 'clicky-analytics:view-analytics';
+
     // Static Properties
     // =========================================================================
 
@@ -55,9 +64,9 @@ class ClickyAnalytics extends BasePlugin
     /**
      * @var string The plugin's schema version.
      */
-    public string $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.1.0';
 
-    // Static Methods
+    // Public Methods
     // =========================================================================
 
     /**
@@ -76,9 +85,6 @@ class ClickyAnalytics extends BasePlugin
         ];
     }
 
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      *
@@ -91,6 +97,7 @@ class ClickyAnalytics extends BasePlugin
         parent::init();
         self::$plugin = $this;
 
+        $this->_registerSensitiveKeywords();
         $this->_registerWidgets();
         $this->_registerFieldTypes();
         $this->_registerTwigVariable();

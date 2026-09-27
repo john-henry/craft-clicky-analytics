@@ -21,28 +21,6 @@ use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\services\Api;
 use yii\caching\ArrayCache;
 
-/**
- * Configures known credentials, a fresh in-memory cache, and an Api service
- * whose HTTP client is backed by the given mock responses/exceptions.
- *
- * @param array<int, Response|\Throwable> $responses Queued in call order.
- */
-function clickyApiWithMock(array $responses): Api
-{
-    Craft::$app->set('cache', new ArrayCache());
-
-    $settings = ClickyAnalytics::getInstance()->getSettings();
-    $settings->siteId = '12345';
-    $settings->siteKey = 'test-sitekey';
-    $settings->cacheDuration = 300;
-
-    $api = ClickyAnalytics::getInstance()->getApi();
-    $mock = new MockHandler($responses);
-    $api->setHttpClient(new Client(['handler' => HandlerStack::create($mock)]));
-
-    return $api;
-}
-
 // ---------------------------------------------------------------------------
 // getStats() / _request() via the real HTTP path
 // ---------------------------------------------------------------------------

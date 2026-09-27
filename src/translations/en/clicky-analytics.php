@@ -47,6 +47,8 @@ return [
     // Report widget
     // =========================================================================
     'Visitors over time' => 'Visitors over time',
+    'Date' => 'Date',
+    'Value' => 'Value',
     'Top pages' => 'Top pages',
     'Top sources' => 'Top sources',
     'Top referrals' => 'Top referrals',
@@ -225,4 +227,7 @@ return [
     'The Clicky API returned an unexpected response. Check your Site ID and Sitekey.' => 'The Clicky API returned an unexpected response. Check your Site ID and Sitekey.',
     'Clicky API error: {message}' => 'Clicky API error: {message}',
     'Couldn’t load Clicky data. Check the logs for details.' => 'Couldn’t load Clicky data. Check the logs for details.',
+    'Clicky site' => 'Clicky site',
+    'Which Clicky site to report on. Sites with their own Clicky credentials are listed.' => 'Which Clicky site to report on. Sites with their own Clicky credentials are listed.',
+    'Main Clicky site' => 'Main Clicky site',
 ];

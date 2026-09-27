@@ -22,15 +22,23 @@
  * @copyright Copyright (c) John Henry Donovan
  */
 
-use craft\helpers\App;
-
 return [
-    // Your Clicky Site ID. Best kept in an environment variable.
-    // Found in Clicky under Preferences → Site → "Site ID & keys".
-    'siteId' => App::env('CLICKY_SITE_ID') ?: null,
+    // Your Clicky Site ID, found in Clicky under Preferences → Site → "Site ID & keys".
+    // Given as an environment variable reference, which the plugin resolves when it's used.
+    'siteId' => '$CLICKY_SITE_ID',
 
-    // Your private Clicky Sitekey. Keep this secret; use an environment variable.
-    'siteKey' => App::env('CLICKY_SITEKEY') ?: null,
+    // Your private Clicky Sitekey. Always give it as a reference like this, not as
+    // `App::env()` or the key itself, so the key never reaches the settings screen.
+    'siteKey' => '$CLICKY_SITE_KEY',
+
+    // Clicky credentials for Craft sites that track into their own Clicky site,
+    // keyed by site handle. Other sites use the pair above.
+    // 'sites' => [
+    //     'siteHandle' => [
+    //         'siteId' => '$CLICKY_OTHER_SITE_ID',
+    //         'siteKey' => '$CLICKY_OTHER_SITE_KEY',
+    //     ],
+    // ],
 
     // The date range widgets and the page-stats field use by default. One of:
     // today, yesterday, 2-days-ago, last-7-days, last-14-days, last-28-days,
@@ -53,6 +61,6 @@ return [
     // Whether the CP UI uses a compact density instead of comfortable.
     'compactDensity' => false,
 
-    // Whether the toolbar uses a slim style instead of the full bar.
+    // Whether the ranked lists use slimmer bars instead of full-height ones.
     'slimBarStyle' => false,
 ];

@@ -14,10 +14,10 @@
             {% set canDrill = drilldown and (row.canDrill ?? true) %}
             {% set panelId = 'clicky-drill-' ~ listUid ~ '-' ~ loop.index0 %}
             <li class="clicky-rank__item"
-                {%- if canDrill %} data-clicky-drill="{{ label }}" data-clicky-date="{{ date }}" data-clicky-url="{{ actionUrl('clicky-analytics/country') }}"{% endif %}>
+                {%- if canDrill %} data-clicky-drill="{{ label }}" data-clicky-date="{{ date }}" data-clicky-url="{{ actionUrl('clicky-analytics/country', site|default(null) ? {site: site} : {}) }}"{% endif %}>
                 <span class="clicky-rank__track"></span>
                 <span class="clicky-rank__bar" style="width: {{ pct }}%; background-color: {{ rankBars[min(loop.index0, 3)] }}"></span>
-                {% if canDrill %}<button type="button" class="clicky-rank__toggle" aria-expanded="false" aria-controls="{{ panelId }}" aria-label="{{ 'Show cities and regions'|t('clicky-analytics') }}">{% include 'clicky-analytics/_components/_icon' with { name: 'chevron' } only %}</button>{% endif %}
+                {% if canDrill %}<button type="button" class="clicky-rank__toggle" aria-expanded="false" aria-controls="{{ panelId }}" aria-label="{{ 'Show cities and regions for {label}'|t('clicky-analytics', { label: label }) }}">{% include 'clicky-analytics/_components/_icon' with { name: 'chevron' } only %}</button>{% elseif drilldown %}<span class="clicky-rank__toggle-spacer" aria-hidden="true"></span>{% endif %}
                 <span class="clicky-rank__label" title="{{ label }}">
                     {% if row.code is defined %}
                         <span class="clicky-rank__flag">
@@ -37,7 +37,7 @@
                         </span>
                     {% endif %}
                     {% if row.url is defined and row.url starts with 'http' %}
-                        <a href="{{ row.url }}" target="_blank" rel="noopener">{{ label }}</a>
+                        <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ label }}</a>
                     {% else %}
                         {{ label }}
                     {% endif %}
@@ -48,11 +48,11 @@
                         {% if row.value_percent is defined %}<em>{{ row.value_percent }}%</em>{% endif %}
                     </span>
                     {% if row.stats_url is defined and row.stats_url %}
-                        <a class="clicky-rank__ext" href="{{ row.stats_url }}" target="_blank" rel="noopener" title="{{ 'Open in Clicky'|t('clicky-analytics') }}" aria-label="{{ 'Open in Clicky'|t('clicky-analytics') }}">{% include 'clicky-analytics/_components/_icon' with { name: 'external' } only %}</a>
+                        <a class="clicky-rank__ext" href="{{ row.stats_url }}" target="_blank" rel="noopener noreferrer" title="{{ 'Open in Clicky'|t('clicky-analytics') }}" aria-label="{{ 'Open in Clicky'|t('clicky-analytics') }}">{% include 'clicky-analytics/_components/_icon' with { name: 'external' } only %}</a>
                     {% endif %}
                 </span>
             </li>
-            {% if canDrill %}<li id="{{ panelId }}" class="clicky-drill" data-clicky-drill-panel role="region" aria-label="{{ 'Cities and regions for {label}'|t('clicky-analytics', {label: label}) }}" hidden></li>{% endif %}
+            {% if canDrill %}<li id="{{ panelId }}" class="clicky-drill" data-clicky-drill-panel aria-label="{{ 'Cities and regions for {label}'|t('clicky-analytics', {label: label}) }}" hidden></li>{% endif %}
         {% endfor %}
     </ul>
 {% endif %}

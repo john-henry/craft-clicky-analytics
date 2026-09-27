@@ -1,29 +1,12 @@
 <?php
 
 /**
- * Coverage for DateRanges. The resolution maths are pure but read the site time
- * zone and use Craft::t() for labels, so these run as integration tests. Expected
- * dates are computed against the same site time zone to stay robust as the clock
- * moves.
+ * Coverage for DateRanges. Labels use Craft::t(), so these run as integration
+ * tests.
  */
 
 use Craft;
 use johnhenry\clickyanalytics\helpers\DateRanges;
-
-/**
- * Returns "today" in the site time zone as a Y-m-d string, optionally offset by a
- * number of days.
- */
-function siteDay(int $offsetDays = 0): string
-{
-    $date = new DateTime('today', new DateTimeZone(Craft::$app->getTimeZone()));
-
-    if ($offsetDays !== 0) {
-        $date->modify(sprintf('%+d days', $offsetDays));
-    }
-
-    return $date->format('Y-m-d');
-}
 
 // ---------------------------------------------------------------------------
 // Validation
@@ -34,16 +17,14 @@ describe('DateRanges::isValid()', function () {
         expect(DateRanges::isValid('last-7-days'))->toBeTrue();
     });
 
-    it('accepts the custom keyword', function () {
-        expect(DateRanges::isValid('custom'))->toBeTrue();
-    });
-
     it('accepts a YYYY-MM month key', function () {
-        expect(DateRanges::isValid('2024-05'))->toBeTrue();
+        expect(DateRanges::isValid('2026-05'))->toBeTrue();
     });
 
-    it('rejects an unknown key', function () {
-        expect(DateRanges::isValid('last-millennium'))->toBeFalse();
+    it('rejects an unknown key, including the old custom keyword', function () {
+        expect(DateRanges::isValid('fortnight'))->toBeFalse();
+        expect(DateRanges::isValid('custom'))->toBeFalse();
+        expect(DateRanges::isValid('2026-13'))->toBeFalse();
     });
 
     it('rejects null', function () {
@@ -57,11 +38,11 @@ describe('DateRanges::isValid()', function () {
 
 describe('DateRanges::normalize()', function () {
     it('returns a valid value unchanged', function () {
-        expect(DateRanges::normalize('last-14-days'))->toBe('last-14-days');
+        expect(DateRanges::normalize('today'))->toBe('today');
     });
 
     it('falls back to the given default for an invalid value', function () {
-        expect(DateRanges::normalize('nope', 'today'))->toBe('today');
+        expect(DateRanges::normalize('nope', 'last-28-days'))->toBe('last-28-days');
     });
 
     it('falls back to the DEFAULT when both value and default are invalid', function () {
@@ -70,66 +51,51 @@ describe('DateRanges::normalize()', function () {
 });
 
 // ---------------------------------------------------------------------------
-// Relative presets
+// Resolution: presets go to Clicky as keywords, so "today" is today in the
+// Clicky site's time zone, not Craft's
 // ---------------------------------------------------------------------------
 
-describe('DateRanges::resolve(): relative presets', function () {
-    it('resolves "today" to a single day with yesterday as the comparison period', function () {
-        $resolved = DateRanges::resolve('today');
+describe('DateRanges::resolve()', function () {
+    it('sends a relative preset as Clicky\'s own keyword, compared with the period before it', function () {
+        $range = DateRanges::resolve('last-7-days');
 
-        expect($resolved['start'])->toBe(siteDay());
-        expect($resolved['end'])->toBe(siteDay());
-        expect($resolved['date'])->toBe(siteDay());            // single date, no comma
-        expect($resolved['previous'])->toBe(siteDay(-1));      // the day before
+        expect($range['date'])->toBe('last-7-days');
+        expect($range['previous'])->toBe(DateRanges::PREVIOUS_PERIOD);
+        expect($range['label'])->toBe('Last 7 days');
     });
 
-    it('resolves "yesterday" to the previous single day', function () {
-        $resolved = DateRanges::resolve('yesterday');
+    it('sends a month as its full date range, compared with the month before', function () {
+        $range = DateRanges::resolve('2026-03');
 
-        expect($resolved['start'])->toBe(siteDay(-1));
-        expect($resolved['end'])->toBe(siteDay(-1));
+        expect($range['date'])->toBe('2026-03-01,2026-03-31');
+        expect($range['previous'])->toBe('2026-02-01,2026-02-28');
     });
 
-    it('resolves "last-7-days" to a 7-day window with the preceding 7 days as comparison', function () {
-        $resolved = DateRanges::resolve('last-7-days');
-
-        expect($resolved['start'])->toBe(siteDay(-6));
-        expect($resolved['end'])->toBe(siteDay());
-        expect($resolved['date'])->toBe(siteDay(-6) . ',' . siteDay());
-        expect($resolved['previous'])->toBe(siteDay(-13) . ',' . siteDay(-7));
+    it('falls back to the default for an unknown key', function () {
+        expect(DateRanges::resolve('nope')['date'])->toBe(DateRanges::DEFAULT);
     });
 });
 
-// ---------------------------------------------------------------------------
-// Custom ranges
-// ---------------------------------------------------------------------------
-
-describe('DateRanges::resolve(): custom ranges', function () {
-    it('formats a multi-day custom range as "start,end"', function () {
-        $resolved = DateRanges::resolve('custom', siteDay(-3), siteDay(-1));
-
-        expect($resolved['date'])->toBe(siteDay(-3) . ',' . siteDay(-1));
-        expect($resolved['start'])->toBe(siteDay(-3));
-        expect($resolved['end'])->toBe(siteDay(-1));
+describe('DateRanges::precedingPeriod()', function () {
+    it('returns the equal-length range before a reported range', function () {
+        expect(DateRanges::precedingPeriod('2026-09-19,2026-09-25'))->toBe('2026-09-12,2026-09-18');
     });
 
-    it('swaps reversed start/end dates', function () {
-        $resolved = DateRanges::resolve('custom', siteDay(-1), siteDay(-3));
-
-        expect($resolved['start'])->toBe(siteDay(-3));
-        expect($resolved['end'])->toBe(siteDay(-1));
+    it('returns the day before a single reported day', function () {
+        expect(DateRanges::precedingPeriod('2026-09-25'))->toBe('2026-09-24');
     });
 
-    it('caps the end date at today', function () {
-        $resolved = DateRanges::resolve('custom', siteDay(-2), siteDay(5));
-
-        expect($resolved['end'])->toBe(siteDay());
+    it('returns null for something it can\'t read', function () {
+        expect(DateRanges::precedingPeriod('garbage'))->toBeNull();
     });
+});
 
-    it('falls back to the last 7 days when custom dates are missing', function () {
-        $resolved = DateRanges::resolve('custom');
-
-        expect($resolved['start'])->toBe(siteDay(-6));
-        expect($resolved['end'])->toBe(siteDay());
+describe('DateRanges::isClickyDate()', function () {
+    it('accepts range keys and explicit dates, and nothing else', function () {
+        expect(DateRanges::isClickyDate('today'))->toBeTrue();
+        expect(DateRanges::isClickyDate('2026-09-01,2026-09-25'))->toBeTrue();
+        expect(DateRanges::isClickyDate('2026-09-01'))->toBeTrue();
+        expect(DateRanges::isClickyDate('2000-01-01,2026-09-25&type=visitors-list'))->toBeFalse();
+        expect(DateRanges::isClickyDate(''))->toBeFalse();
     });
 });

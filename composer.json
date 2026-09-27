@@ -1,22 +1,19 @@
 {
   "name": "johnhenry/craft-clicky-analytics",
-  "description": "Clicky web analytics for Craft CMS: native dashboard widgets and a per-entry page-stats field, with a live visitor feed, country drilldown and themeable colour schemes, powered by the Clicky API.",
+  "description": "Clicky analytics in the Craft control panel: dashboard widgets, a live visitor feed and a Page Stats field for each entry.",
   "type": "craft-plugin",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "keywords": [
-    "craft",
-    "cms",
-    "craftcms",
-    "craft-plugin",
     "clicky",
-    "clicky-analytics",
-    "analytics",
-    "web-analytics",
-    "statistics",
-    "reporting",
-    "dashboard",
-    "widgets",
-    "live-visitors"
+    "clicky analytics",
+    "web analytics",
+    "visitor statistics",
+    "live visitors",
+    "dashboard widgets",
+    "page stats",
+    "page views",
+    "traffic sources",
+    "analytics dashboard"
   ],
   "license": "MIT",
   "authors": [

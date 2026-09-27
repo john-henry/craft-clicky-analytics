@@ -21,15 +21,16 @@
     warning: 'siteId' in overrides ? overrideWarning,
 }) }}
 
+{% set siteKeyIsLiteral = 'siteKey' in overrides and settings.siteKey and not (settings.siteKey starts with '$') %}
 {{ forms.autosuggestField({
     label: 'Sitekey'|t('clicky-analytics'),
     instructions: 'Your private Clicky Sitekey. Keep this secret; store it in an environment variable.'|t('clicky-analytics'),
     id: 'siteKey',
     name: 'siteKey',
-    suggestEnvVars: true,
-    value: settings.siteKey,
+    suggestEnvVars: not siteKeyIsLiteral,
+    value: siteKeyIsLiteral ? '••••••••' : settings.siteKey,
     required: true,
-    placeholder: '$CLICKY_SITEKEY',
+    placeholder: '$CLICKY_SITE_KEY',
     disabled: 'siteKey' in overrides,
     warning: 'siteKey' in overrides ? overrideWarning,
 }) }}
@@ -47,7 +48,7 @@
     var scope = btn.closest('form') || document;
     function val(suffix) {
         var el = scope.querySelector('[name$="[' + suffix + ']"], [name="' + suffix + '"]');
-        return el ? el.value : '';
+        return el && !el.disabled ? el.value : '';
     }
     function setResult(message, success) {
         out.textContent = message;
@@ -158,7 +159,7 @@
 
 {{ forms.lightswitchField({
     label: 'Slim bar style'|t('clicky-analytics'),
-    instructions: 'Use a slimmer toolbar instead of the full-size bar.'|t('clicky-analytics'),
+    instructions: 'Use slimmer bars in the ranked lists instead of full-height ones.'|t('clicky-analytics'),
     id: 'slimBarStyle',
     name: 'slimBarStyle',
     on: settings.slimBarStyle,

@@ -5,5 +5,5 @@
         {% include 'clicky-analytics/_components/_statCard' with { label: 'Bounce'|t('clicky-analytics'), metric: overview.bounceRate, suffix: '%' } only %}
         {% include 'clicky-analytics/_components/_statCard' with { label: 'Avg. time'|t('clicky-analytics'), metric: overview.time } only %}
     </div>
-    {% include 'clicky-analytics/_components/_lineChart' with { series: series } only %}
+    {% include 'clicky-analytics/_components/_lineChart' with { series: series, compact: compactChart ?? false } only %}
 </div>

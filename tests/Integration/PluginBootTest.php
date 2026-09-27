@@ -54,7 +54,7 @@ describe('Plugin wiring', function() {
     it('registers its user permission', function() {
         $all = Craft::$app->getUserPermissions()->getAllPermissions();
 
-        expect(json_encode($all))->toContain('clicky-analytics:addWidgets');
+        expect(json_encode($all))->toContain(ClickyAnalytics::PERMISSION_VIEW_ANALYTICS);
     });
 
     it('exposes the twig variable', function() {

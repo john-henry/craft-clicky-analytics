@@ -7,7 +7,6 @@
 namespace johnhenry\clickyanalytics\widgets;
 
 use Craft;
-use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\DateRanges;
 use johnhenry\clickyanalytics\helpers\Palette;
 use johnhenry\clickyanalytics\services\Api;
@@ -29,6 +28,52 @@ class ReportWidget extends BaseListWidget
     // =========================================================================
 
     /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    public function getTitle(): string
+    {
+        $label = self::totalOptions()[$this->metric] ?? self::reportOptions()[$this->metric] ?? Craft::t('clicky-analytics', 'Report');
+        return $label;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    public function getSettingsHtml(): ?string
+    {
+        return $this->siteSettingHtml() . Craft::$app->getView()->renderTemplate('clicky-analytics/_components/widgets/_reportSettings', [
+            'widget' => $this,
+            'displayOptions' => self::displayOptions(),
+            'totalOptions' => self::totalOptions(),
+            'reportOptions' => self::reportOptions(),
+            'rangeOptions' => DateRanges::widgetOptions(),
+        ]);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+        $rules[] = [['display'], 'in', 'range' => array_keys(self::displayOptions())];
+        $rules[] = [['metric'], 'in', 'range' => array_merge(array_keys(self::totalOptions()), array_keys(self::reportOptions()))];
+        return $rules;
+    }
+
+    /**
      * @var string The visualisation type (counter/line/bar/pie).
      */
     public string $display = 'counter';
@@ -43,6 +88,9 @@ class ReportWidget extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public static function displayName(): string
     {
@@ -118,42 +166,9 @@ class ReportWidget extends BaseListWidget
 
     /**
      * @inheritdoc
-     */
-    public function rules(): array
-    {
-        $rules = parent::rules();
-        $rules[] = [['display', 'metric'], 'string'];
-        return $rules;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle(): string
-    {
-        $label = self::totalOptions()[$this->metric] ?? self::reportOptions()[$this->metric] ?? Craft::t('clicky-analytics', 'Report');
-        return Craft::t('clicky-analytics', 'Clicky Analytics') . ': ' . $label;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSettingsHtml(): ?string
-    {
-        return Craft::$app->getView()->renderTemplate('clicky-analytics/_components/widgets/_reportSettings', [
-            'widget' => $this,
-            'displayOptions' => self::displayOptions(),
-            'totalOptions' => self::totalOptions(),
-            'reportOptions' => self::reportOptions(),
-            'rangeOptions' => DateRanges::widgetOptions(),
-        ]);
-    }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyTemplate(): string
     {
@@ -162,10 +177,13 @@ class ReportWidget extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyData(): array
     {
-        $api = ClickyAnalytics::getInstance()->getApi();
+        $api = $this->api();
         $date = $this->resolveRange();
         $isTotal = isset(self::totalOptions()[$this->metric]);
 
@@ -176,6 +194,8 @@ class ReportWidget extends BaseListWidget
                 'display' => 'line',
                 'accent' => Palette::primary(),
                 'series' => $api->getDailySeries($tally, $date),
+                'label' => self::totalOptions()[$tally],
+                'compactChart' => ($this->colspan ?? 1) < 2,
             ];
         }
 
@@ -222,7 +242,7 @@ class ReportWidget extends BaseListWidget
 
             return match ($this->metric) {
                 'bounce-rate' => $value . '%',
-                'time-average' => $value < 60 ? $value . 's' : intdiv($value, 60) . 'm ' . ($value % 60) . 's',
+                'time-average' => Api::formatDuration($value),
                 default => Craft::$app->getFormatter()->asInteger($value),
             };
         }

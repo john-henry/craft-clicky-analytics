@@ -1,7 +1,9 @@
 {% if series is empty %}
     <p class="clicky-muted">{{ 'No data for this period.'|t('clicky-analytics') }}</p>
 {% else %}
-    {% set w = 1000 %}{% set h = 300 %}
+    {% set compact = compact ?? false %}
+    {% set w = compact ? 500 : 1000 %}{% set h = compact ? 190 : 300 %}
+    {% set gradientId = 'clicky-area-' ~ random(100000, 999999) %}
     {% set padL = 38 %}{% set padR = 12 %}{% set padT = 12 %}{% set padB = 28 %}
     {% set plotW = w - padL - padR %}
     {% set plotH = h - padT - padB %}
@@ -28,9 +30,10 @@
     {% set step = (n / 8)|round(0, 'ceil') %}
     {% set step = step < 1 ? 1 : step %}
 
-    <svg class="clicky-chart" viewBox="0 0 {{ w }} {{ h }}" role="img" aria-label="{{ 'Visitors over time'|t('clicky-analytics') }}">
+    {% set chartLabel = label ?? 'Visitors over time'|t('clicky-analytics') %}
+    <svg class="clicky-chart" viewBox="0 0 {{ w }} {{ h }}" role="img" aria-label="{{ chartLabel }}">
         <defs>
-            <linearGradient id="clicky-area" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="{{ gradientId }}" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--clicky-soft, var(--clicky-accent))" stop-opacity="0.9"/>
                 <stop offset="100%" stop-color="var(--clicky-soft, var(--clicky-accent))" stop-opacity="0"/>
             </linearGradient>
@@ -40,7 +43,7 @@
             <line class="clicky-chart__grid" x1="{{ padL }}" y1="{{ gy }}" x2="{{ w - padR }}" y2="{{ gy }}"/>
             <text class="clicky-chart__ylabel" x="{{ padL - 8 }}" y="{{ gy + 4 }}">{{ (max * (1 - g / 4))|round }}</text>
         {% endfor %}
-        <path d="{{ area }}" fill="url(#clicky-area)"/>
+        <path d="{{ area }}" fill="url(#{{ gradientId }})"/>
         <path d="{{ line }}" class="clicky-chart__line"/>
         {% for pt in pts %}
             <circle class="clicky-chart__dot" cx="{{ pt.x }}" cy="{{ pt.y }}" r="3.5"><title>{{ pt.d }}: {{ pt.v|number }}</title></circle>
@@ -51,4 +54,21 @@
             {% endif %}
         {% endfor %}
     </svg>
+    <table class="visually-hidden">
+        <caption>{{ chartLabel }}</caption>
+        <thead>
+            <tr>
+                <th scope="col">{{ 'Date'|t('clicky-analytics') }}</th>
+                <th scope="col">{{ 'Value'|t('clicky-analytics') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pt in pts %}
+                <tr>
+                    <td>{{ pt.d|date('j M Y') }}</td>
+                    <td>{{ pt.v|number }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endif %}

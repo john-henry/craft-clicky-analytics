@@ -61,8 +61,13 @@ describe('SettingsController::actionTest method', function () {
 // ---------------------------------------------------------------------------
 
 describe('SettingsController::actionTest outcome', function () {
-    it('reports failure when either credential is empty', function () {
+    it('reports failure when either credential is empty and nothing is saved', function () {
         $this->actingAs(UserFactory::factory()->admin(true)->create());
+
+        // An empty field tests the saved setting, so clear it for this request
+        $settings = ClickyAnalytics::getInstance()->getSettings();
+        $settings->siteId = null;
+        $settings->siteKey = null;
 
         $json = $this->postJson('admin/actions/clicky-analytics/settings/test', [
             'siteId' => '',
@@ -70,6 +75,19 @@ describe('SettingsController::actionTest outcome', function () {
         ])->getJsonContent();
 
         expect($json['success'])->toBeFalse();
+    });
+
+    it('won\'t resolve an environment variable that isn\'t Clicky\'s', function () {
+        $this->actingAs(UserFactory::factory()->admin(true)->create());
+        clickyApiWithMock([]);
+
+        $json = $this->postJson('admin/actions/clicky-analytics/settings/test', [
+            'siteId' => '$CRAFT_DB_DATABASE',
+            'siteKey' => '$CRAFT_SECURITY_KEY',
+        ])->getJsonContent();
+
+        expect($json['success'])->toBeFalse();
+        expect(clickyRequestQueries())->toBe([]);
     });
 
     it('reports success for valid credentials over a mocked Clicky API', function () {

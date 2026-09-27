@@ -15,14 +15,20 @@
  * mocked Guzzle client via Api::setHttpClient() to exercise the real request and
  * error-handling paths (timeouts, non-JSON bodies, Clicky {error} responses).
  *
- * Run from the parent Craft project (not from inside the plugin folder):
- *
- *   ddev exec vendor/bin/pest plugins/craft-clicky-analytics/tests \
- *     --test-directory=plugins/craft-clicky-analytics/tests
+ * Run from the repo root with `ddev exec composer test:ca`, which passes the
+ * --test-directory flag this file needs to be loaded at all.
  */
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
+use johnhenry\clickyanalytics\ClickyAnalytics;
+use johnhenry\clickyanalytics\services\Api;
 use markhuot\craftpest\test\RefreshesDatabase;
 use markhuot\craftpest\test\TestCase;
+use yii\caching\ArrayCache;
 
 uses(
     TestCase::class,
@@ -56,3 +62,64 @@ uses()->beforeEach(function() {
         ));
     }
 })->in('Integration');
+
+// Tests swap in an in-memory cache and a mocked HTTP client; put Craft's own
+// cache and a real client back afterwards, so nothing leaks into later tests.
+uses()->beforeEach(function() {
+    $this->originalCache = Craft::$app->getCache();
+})->afterEach(function() {
+    Craft::$app->set('cache', $this->originalCache);
+    ClickyAnalytics::getInstance()->getApi()->setHttpClient(null);
+})->in('Integration');
+
+/**
+ * Configures known credentials, a fresh in-memory cache, and an Api service
+ * whose HTTP client is backed by the given mock responses/exceptions.
+ *
+ * @param array<int, Response|\Throwable> $responses Queued in call order.
+ */
+function clickyApiWithMock(array $responses): Api
+{
+    // Every request the mock answers is recorded here, for tests that check
+    // what was sent.
+    $GLOBALS['clickyRequests'] = [];
+
+    Craft::$app->set('cache', new ArrayCache());
+
+    $settings = ClickyAnalytics::getInstance()->getSettings();
+    $settings->siteId = '12345';
+    $settings->siteKey = 'test-sitekey';
+    $settings->cacheDuration = 300;
+
+    $api = ClickyAnalytics::getInstance()->getApi();
+    $mock = new MockHandler($responses);
+    $stack = HandlerStack::create($mock);
+    $stack->push(Middleware::history($GLOBALS['clickyRequests']));
+    $api->setHttpClient(new Client(['handler' => $stack]));
+
+    return $api;
+}
+
+
+/**
+ * Returns the query parameters of each request the mocked client was sent.
+ *
+ * @return array<int, array<string, string>>
+ */
+function clickyRequestQueries(): array
+{
+    return array_map(static function(array $entry): array {
+        parse_str($entry['request']->getUri()->getQuery(), $query);
+        return $query;
+    }, $GLOBALS['clickyRequests'] ?? []);
+}
+
+/**
+ * A Clicky response carrying one tally value.
+ */
+function clickyTallyResponse(string $type, int $value): Response
+{
+    return new Response(200, [], json_encode([
+        ['type' => $type, 'dates' => [['date' => '2026-09-25', 'items' => [['value' => (string)$value]]]]],
+    ]));
+}

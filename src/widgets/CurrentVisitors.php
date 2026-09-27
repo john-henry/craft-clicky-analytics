@@ -7,7 +7,6 @@
 namespace johnhenry\clickyanalytics\widgets;
 
 use Craft;
-use johnhenry\clickyanalytics\ClickyAnalytics;
 
 /**
  * Current Visitors widget.
@@ -24,6 +23,9 @@ class CurrentVisitors extends BaseWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public static function displayName(): string
     {
@@ -35,6 +37,9 @@ class CurrentVisitors extends BaseWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public function getTitle(): string
     {
@@ -46,6 +51,9 @@ class CurrentVisitors extends BaseWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyTemplate(): string
     {
@@ -54,11 +62,14 @@ class CurrentVisitors extends BaseWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyData(): array
     {
         return [
-            'visitorsOnline' => ClickyAnalytics::getInstance()->getApi()->getVisitorsOnline(),
+            'visitorsOnline' => $this->api()->getVisitorsOnline(),
         ];
     }
 }

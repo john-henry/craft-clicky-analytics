@@ -7,8 +7,11 @@
 namespace johnhenry\clickyanalytics\variables;
 
 use Craft;
+use craft\base\ElementInterface;
 use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\Palette;
+use johnhenry\clickyanalytics\services\Api;
+use Throwable;
 
 /**
  * Clicky Analytics Twig variable.
@@ -127,7 +130,7 @@ class ClickyVariable
      */
     public function isConfigured(): bool
     {
-        return ClickyAnalytics::getInstance()->getApi()->isConfigured();
+        return $this->_api()->isConfigured();
     }
 
     /**
@@ -139,7 +142,7 @@ class ClickyVariable
      */
     public function getVisitorsOnline(): int
     {
-        return ClickyAnalytics::getInstance()->getApi()->getVisitorsOnline();
+        return $this->_safely(fn() => $this->_api()->getVisitorsOnline(), 0);
     }
 
     /**
@@ -152,7 +155,7 @@ class ClickyVariable
      */
     public function overview(string $date = 'last-7-days'): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getOverview($date);
+        return $this->_safely(fn() => $this->_api()->getOverview($date), []);
     }
 
     /**
@@ -166,7 +169,7 @@ class ClickyVariable
      */
     public function topPages(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopPages($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopPages($date, $limit), []);
     }
 
     /**
@@ -180,7 +183,7 @@ class ClickyVariable
      */
     public function topSources(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopSources($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopSources($date, $limit), []);
     }
 
     /**
@@ -194,7 +197,7 @@ class ClickyVariable
      */
     public function topReferrers(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopReferrers($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopReferrers($date, $limit), []);
     }
 
     /**
@@ -208,7 +211,7 @@ class ClickyVariable
      */
     public function topSearchEngines(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopSearchEngines($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopSearchEngines($date, $limit), []);
     }
 
     /**
@@ -222,7 +225,7 @@ class ClickyVariable
      */
     public function topOperatingSystems(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopOperatingSystems($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopOperatingSystems($date, $limit), []);
     }
 
     /**
@@ -236,7 +239,7 @@ class ClickyVariable
      */
     public function topCountries(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopCountries($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopCountries($date, $limit), []);
     }
 
     /**
@@ -250,7 +253,7 @@ class ClickyVariable
      */
     public function topDevices(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopDevices($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopDevices($date, $limit), []);
     }
 
     /**
@@ -264,7 +267,7 @@ class ClickyVariable
      */
     public function entryPages(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getEntryPages($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getEntryPages($date, $limit), []);
     }
 
     /**
@@ -278,7 +281,7 @@ class ClickyVariable
      */
     public function exitPages(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getExitPages($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getExitPages($date, $limit), []);
     }
 
     /**
@@ -292,7 +295,7 @@ class ClickyVariable
      */
     public function topDownloads(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopDownloads($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopDownloads($date, $limit), []);
     }
 
     /**
@@ -306,7 +309,7 @@ class ClickyVariable
      */
     public function topGoals(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopGoals($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopGoals($date, $limit), []);
     }
 
     /**
@@ -320,22 +323,34 @@ class ClickyVariable
      */
     public function topCampaigns(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopCampaigns($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopCampaigns($date, $limit), []);
     }
 
     /**
-     * Returns analytics for a single page path.
+     * Returns analytics for a single page: an entry (or any element with a
+     * URL), a full URL, or a path.
      *
-     * @param string $href The page path (e.g. `/blog/my-post`).
+     * @param ElementInterface|string $page The element, URL or path (e.g. `/blog/my-post`).
      * @param string $date A Clicky date expression.
      * @param int $visitorLimit The maximum recent visitors to include.
-     * @return array The page stats payload.
+     * @return array The page stats payload, or an empty array if the page has no URL or Clicky can't be reached.
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
-    public function pageStats(string $href, string $date = 'last-90-days', int $visitorLimit = 5): array
+    public function pageStats(ElementInterface|string $page, string $date = 'last-28-days', int $visitorLimit = 5): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getPageStats($href, $date, $visitorLimit);
+        $api = $this->_api();
+
+        if ($page instanceof ElementInterface) {
+            $api = $api->forSite($page->getSite());
+            $page = (string)$page->getUrl();
+
+            if ($page === '') {
+                return [];
+            }
+        }
+
+        return $this->_safely(fn() => $api->getPageStats(Api::pathFromUrl($page), $date, $visitorLimit), []);
     }
 
     /**
@@ -349,7 +364,7 @@ class ClickyVariable
      */
     public function topCities(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopCities($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopCities($date, $limit), []);
     }
 
     /**
@@ -363,7 +378,7 @@ class ClickyVariable
      */
     public function topRegions(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopRegions($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopRegions($date, $limit), []);
     }
 
     /**
@@ -377,7 +392,7 @@ class ClickyVariable
      */
     public function topScreenResolutions(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopScreenResolutions($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopScreenResolutions($date, $limit), []);
     }
 
     /**
@@ -391,7 +406,7 @@ class ClickyVariable
      */
     public function recentVisitors(string $date = 'last-7-days', int $limit = 12): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getRecentVisitors($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getRecentVisitors($date, $limit), []);
     }
 
     /**
@@ -405,6 +420,44 @@ class ClickyVariable
      */
     public function topBrowsers(string $date = 'last-7-days', int $limit = 10): array
     {
-        return ClickyAnalytics::getInstance()->getApi()->getTopBrowsers($date, $limit);
+        return $this->_safely(fn() => $this->_api()->getTopBrowsers($date, $limit), []);
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Returns the API service for the current site's Clicky credentials.
+     *
+     * @return Api The API service.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    private function _api(): Api
+    {
+        return ClickyAnalytics::getInstance()->getApi()->forSite(Craft::$app->getSites()->getCurrentSite());
+    }
+
+    /**
+     * Runs an API call for a template, returning the fallback instead when it
+     * fails. Twig can't catch exceptions, so an unreachable Clicky would
+     * otherwise take the whole page down with it.
+     *
+     * @template T
+     * @param callable(): T $call The API call.
+     * @param T $fallback What to return if it fails.
+     * @return T The call's result, or the fallback.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    private function _safely(callable $call, mixed $fallback): mixed
+    {
+        try {
+            return $call();
+        } catch (Throwable $e) {
+            Craft::warning('Clicky data for a template couldn’t be loaded: ' . $e->getMessage(), 'clicky-analytics');
+
+            return $fallback;
+        }
     }
 }

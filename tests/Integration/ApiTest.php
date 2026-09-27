@@ -165,27 +165,20 @@ describe('Api::getStats()', function () {
     })->throws(RuntimeException::class);
 
     it('treats cacheDuration=0 as "disable caching", not Yii\'s "never expire"', function () {
-        // The settings screen and config.php document 0 as "disable caching".
-        // Yii's cache component instead treats a set() duration of 0 as "never
-        // expire" - the plugin must override that, not inherit it. Seed the
-        // cache, set cacheDuration to 0, and confirm the seeded value is not
-        // served back (mirrors the getVisitorsOnline() bypass test above).
-        $api = clickyApi();
+        // A seeded 99 must be neither served nor overwritten when caching is
+        // off: the mocked API answers 7.
+        $api = clickyApiWithMock([clickyTallyResponse('pages', 7)]);
         ClickyAnalytics::getInstance()->getSettings()->cacheDuration = 0;
         seedClicky(['pages'], 'today', [], [
             clickyBlock('pages', [['title' => 'Stale', 'value' => 99]]),
         ]);
 
-        try {
-            $api->getStats(['pages'], 'today');
-        } catch (RuntimeException) {
-            // Expected in an offline test environment; irrelevant to this assertion.
-        }
+        expect($api->getStats(['pages'], 'today')['pages'][0]['value'])->toBe('7');
+        expect(clickyRequestQueries())->toHaveCount(1);
 
-        // The bypass call must not have overwritten the cache either - read it
-        // back with cacheDuration restored to confirm the seeded value survives.
         ClickyAnalytics::getInstance()->getSettings()->cacheDuration = 300;
-        expect($api->getStats(['pages'], 'today')['pages'][0]['value'])->toBe(99);
+        $cached = Craft::$app->getCache()->get('clicky-analytics:' . md5(Json::encode([CLICKY_TEST_SITE_ID, ['pages'], 'today', []])));
+        expect($cached[0]['dates'][0]['items'][0]['value'])->toBe(99);
     });
 });
 
@@ -274,26 +267,13 @@ describe('Api tally helpers', function () {
         expect($api->getTally('visitors-online', 'today'))->toBe(7);
     });
 
-    it('getVisitorsOnline() never writes to the response cache', function () {
-        // getVisitorsOnline() always passes bypassCache=true, so calling it must
-        // not overwrite whatever is already cached under the same key. Rather
-        // than assert on getVisitorsOnline()'s own return value (which depends
-        // on a real, unmocked HTTP call succeeding or failing), seed the cache,
-        // call getVisitorsOnline() and discard the outcome either way, then read
-        // the cache back through a normal (non-bypass) getTally() call - if the
-        // bypass call had written to the cache, this would no longer be 99.
-        $api = clickyApi();
-        seedClicky(['visitors-online'], 'today', [], [
-            clickyBlock('visitors-online', [['value' => 99]]),
-        ]);
+    it('getVisitorsOnline() asks Clicky once, then serves the short-lived cached count', function () {
+        // Only one response is queued: a second request would fail the test.
+        $api = clickyApiWithMock([clickyTallyResponse('visitors-online', 7)]);
 
-        try {
-            $api->getVisitorsOnline();
-        } catch (RuntimeException) {
-            // Expected in an offline test environment; irrelevant to this assertion.
-        }
-
-        expect($api->getTally('visitors-online', 'today'))->toBe(99);
+        expect($api->getVisitorsOnline())->toBe(7);
+        expect($api->getVisitorsOnline())->toBe(7);
+        expect(clickyRequestQueries())->toHaveCount(1);
     });
 
     it('getNewVsReturning() derives the returning count from the total', function () {

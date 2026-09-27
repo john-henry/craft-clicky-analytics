@@ -20,6 +20,23 @@ abstract class BaseListWidget extends BaseStatsWidget
     // Public Properties
     // =========================================================================
 
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     *
+     * @return array The validation rules.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+        $rules[] = [['limit'], 'integer', 'min' => 1, 'max' => 100];
+        return $rules;
+    }
+
     /**
      * @var int The maximum number of rows to show.
      */
@@ -43,23 +60,6 @@ abstract class BaseListWidget extends BaseStatsWidget
     {
         return array_merge(parent::settingsAttributes(), ['limit']);
     }
-
-    /**
-     * @inheritdoc
-     *
-     * @return array The validation rules.
-     * @author John Henry Donovan <info@johnhenry.ie>
-     * @since 1.0.0
-     */
-    public function rules(): array
-    {
-        $rules = parent::rules();
-        $rules[] = [['limit'], 'integer', 'min' => 1, 'max' => 100];
-        return $rules;
-    }
-
-    // Protected Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
