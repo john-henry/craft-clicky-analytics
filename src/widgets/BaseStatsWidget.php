@@ -103,7 +103,7 @@ abstract class BaseStatsWidget extends BaseWidget
      * Resolves the widget's date range (key + comparison period + Clicky dates),
      * falling back to the plugin default.
      *
-     * @return array{date: string, previous: string, label: string, start: string, end: string} The resolved range.
+     * @return array{date: string, previous: string, label: string} The resolved range.
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
