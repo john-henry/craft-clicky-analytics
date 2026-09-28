@@ -9,10 +9,12 @@ namespace johnhenry\clickyanalytics\services;
 use Craft;
 use craft\base\Component;
 use craft\helpers\Json;
+use craft\models\Site;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\Browsers;
+use johnhenry\clickyanalytics\helpers\DateRanges;
 use johnhenry\clickyanalytics\helpers\Devices;
 use johnhenry\clickyanalytics\helpers\Flags;
 use johnhenry\clickyanalytics\helpers\OperatingSystems;
@@ -27,20 +29,48 @@ use RuntimeException;
  * Clicky's nested `[{type, dates:[{items:[…]}]}]` response into flat arrays, and
  * caches results for the configured duration. The typed helper methods on top of
  * it (overview, top pages, …) are what the dashboard, widgets and Twig variable
- * consume.
+ * consume. {@see forSite()} returns a copy that uses a Craft site's own Clicky
+ * credentials, for installs where sites track into separate Clicky sites.
  *
  * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 class Api extends Component
 {
-    // Constants
+    // Const Properties
     // =========================================================================
 
     /**
      * @var string The Clicky stats API endpoint.
      */
     public const ENDPOINT = 'https://api.clicky.com/api/stats/4';
+
+    /**
+     * @var int How long, in seconds, a failed request stops further calls, so a
+     * slow or unreachable Clicky isn't retried on every page load.
+     */
+    public const FAILURE_BACKOFF = 60;
+
+    /**
+     * @var int How long, in seconds, the visitors-online count is cached.
+     */
+    public const ONLINE_CACHE_DURATION = 30;
+
+    /**
+     * @var int The default request timeout, in seconds, unless `config/guzzle.php` sets one.
+     */
+    public const TIMEOUT = 5;
+
+    /**
+     * @var int The default connection timeout, in seconds, unless `config/guzzle.php` sets one.
+     */
+    public const CONNECT_TIMEOUT = 3;
+
+    /**
+     * @var string[] The `visitors-list` fields that identify a visitor and are never used, so they're
+     * dropped before a response is cached.
+     */
+    private const PRIVATE_VISITOR_FIELDS = ['ip_address', 'hostname', 'organization', 'latitude', 'longitude', 'uid'];
 
     // Private Properties
     // =========================================================================
@@ -50,6 +80,11 @@ class Api extends Component
      * Clicky API responses. When null, a real Guzzle client is created per request.
      */
     private ?Client $_httpClient = null;
+
+    /**
+     * @var string|null The Craft site handle whose Clicky credentials to use, or null for the default pair.
+     */
+    private ?string $_siteHandle = null;
 
     // Public Methods
     // =========================================================================
@@ -72,6 +107,61 @@ class Api extends Component
     }
 
     /**
+     * Returns the path Clicky knows a page by, from its URL: no host or query
+     * string, with any non-ASCII characters percent-encoded the way a browser
+     * sends them.
+     *
+     * @param string $url A full URL or a path.
+     * @return string The path, `/` for the homepage.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    public static function pathFromUrl(string $url): string
+    {
+        $path = parse_url($url, PHP_URL_PATH) ?: '/';
+
+        return preg_replace_callback('/[^\x21-\x7E]+/', static fn(array $m): string => rawurlencode($m[0]), $path) ?? $path;
+    }
+
+    /**
+     * Formats a number of seconds as a compact duration, such as "45s", "2m"
+     * or "1m 39s".
+     *
+     * @param int $seconds The duration in seconds.
+     * @return string The formatted duration.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    public static function formatDuration(int $seconds): string
+    {
+        if ($seconds < 60) {
+            return $seconds . 's';
+        }
+
+        $minutes = intdiv($seconds, 60);
+        $remainder = $seconds % 60;
+
+        return $remainder > 0 ? "{$minutes}m {$remainder}s" : "{$minutes}m";
+    }
+
+    /**
+     * Returns a copy of the service that uses a Craft site's own Clicky Site ID
+     * and Sitekey, when the plugin settings give it one.
+     *
+     * @param Site|string|null $site The Craft site or its handle, or null for the default credentials.
+     * @return static The site's API service.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    public function forSite(Site|string|null $site): static
+    {
+        $api = clone $this;
+        $api->_siteHandle = $site instanceof Site ? $site->handle : $site;
+
+        return $api;
+    }
+
+    /**
      * Returns whether the plugin has both a Site ID and a Sitekey configured.
      *
      * @return bool Whether the API is configured.
@@ -81,7 +171,7 @@ class Api extends Component
     public function isConfigured(): bool
     {
         $settings = ClickyAnalytics::getInstance()->getSettings();
-        return $settings->getSiteId() !== null && $settings->getSiteKey() !== null;
+        return $settings->getSiteId($this->_siteHandle) !== null && $settings->getSiteKey($this->_siteHandle) !== null;
     }
 
     /**
@@ -91,7 +181,7 @@ class Api extends Component
      * @param string[] $types The Clicky report types (e.g. `['pages', 'countries']`).
      * @param string $date A Clicky date expression (e.g. `today`, `last-7-days`).
      * @param array $params Extra query parameters (e.g. `['limit' => 10]`).
-     * @param bool $bypassCache Whether to skip the response cache and always fetch fresh (used for the real-time online-visitor tally).
+     * @param bool $bypassCache Whether to skip the response cache and always fetch fresh.
      * @return array<string, array<int, array>> Items keyed by report type.
      * @throws RuntimeException if the API is misconfigured or returns an error.
      * @author John Henry Donovan <info@johnhenry.ie>
@@ -99,7 +189,7 @@ class Api extends Component
      */
     public function getStats(array $types, string $date, array $params = [], bool $bypassCache = false): array
     {
-        $response = $this->_request($types, $date, $params, $bypassCache);
+        $response = $this->_request($types, $date, $params, $bypassCache ? 0 : null);
 
         return $this->_flatten($response, $types);
     }
@@ -157,8 +247,9 @@ class Api extends Component
     /**
      * Returns the number of visitors currently online.
      *
-     * Bypasses the response cache - unlike the rest of the API, a stale count
-     * defeats the purpose of a widget titled "Visitors Online".
+     * Cached for {@see ONLINE_CACHE_DURATION} seconds rather than the usual
+     * duration, so the count stays close to live without a Clicky call on every
+     * page that shows it.
      *
      * @return int The online visitor count.
      * @throws RuntimeException if the API is misconfigured or returns an error.
@@ -167,7 +258,12 @@ class Api extends Component
      */
     public function getVisitorsOnline(): int
     {
-        return $this->getTally('visitors-online', 'today', bypassCache: true);
+        $items = $this->_flatten(
+            $this->_request(['visitors-online'], 'today', [], self::ONLINE_CACHE_DURATION),
+            ['visitors-online'],
+        )['visitors-online'];
+
+        return (int)($items[0]['value'] ?? 0);
     }
 
     /**
@@ -199,7 +295,8 @@ class Api extends Component
      * period is given, a period-over-period trend.
      *
      * @param string $date A Clicky date expression.
-     * @param string|null $previousDate A Clicky date expression for the prior period (for trends).
+     * @param string|null $previousDate A Clicky date expression for the prior period (for trends), or
+     * {@see DateRanges::PREVIOUS_PERIOD} to compare with the equal-length period before the one Clicky reports.
      * @return array<string, array> The overview metrics, keyed visitors/actions/bounceRate/time.
      * @throws RuntimeException if the API is misconfigured or returns an error.
      * @author John Henry Donovan <info@johnhenry.ie>
@@ -208,7 +305,13 @@ class Api extends Component
     public function getOverview(string $date, ?string $previousDate = null): array
     {
         $types = ['visitors', 'actions', 'bounce-rate', 'time-average'];
-        $current = $this->getStats($types, $date);
+        $response = $this->_request($types, $date);
+        $current = $this->_flatten($response, $types);
+
+        if ($previousDate === DateRanges::PREVIOUS_PERIOD) {
+            $reported = (string)($response[0]['dates'][0]['date'] ?? '');
+            $previousDate = $reported !== '' ? DateRanges::precedingPeriod($reported) : null;
+        }
 
         $previous = null;
         if ($previousDate !== null) {
@@ -223,7 +326,7 @@ class Api extends Component
         $value = static fn(?array $stats, string $type): int => (int)($stats[$type][0]['value'] ?? 0);
 
         $time = $this->_metric($value($current, 'time-average'), $previous ? $value($previous, 'time-average') : null, true);
-        $time['pretty'] = $this->_prettyTime($time['value']);
+        $time['pretty'] = self::formatDuration($time['value']);
 
         return [
             'visitors' => $this->_metric($value($current, 'visitors'), $previous ? $value($previous, 'visitors') : null, true),
@@ -689,6 +792,10 @@ class Api extends Component
             return ['success' => false, 'message' => Craft::t('clicky-analytics', 'Enter both a Site ID and a Sitekey.')];
         }
 
+        if (!ctype_digit($siteId)) {
+            return ['success' => false, 'message' => Craft::t('clicky-analytics', 'The Site ID should be a number.')];
+        }
+
         try {
             $response = $this->_client()->get(self::ENDPOINT, [
                 'query' => [
@@ -702,15 +809,16 @@ class Api extends Component
             ]);
             $data = Json::decodeIfJson((string)$response->getBody());
         } catch (GuzzleException $e) {
-            return ['success' => false, 'message' => Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => self::_redactSitekey($e->getMessage())])];
+            return ['success' => false, 'message' => Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => self::_redact($e->getMessage(), $siteKey)])];
         }
 
         if (!is_array($data)) {
             return ['success' => false, 'message' => Craft::t('clicky-analytics', 'Invalid Site ID or Sitekey.')];
         }
 
-        if (isset($data['error'])) {
-            return ['success' => false, 'message' => (string)$data['error'] ?: Craft::t('clicky-analytics', 'Invalid Site ID or Sitekey.')];
+        $error = self::_errorMessage($data);
+        if ($error !== null) {
+            return ['success' => false, 'message' => self::_redact($error, $siteKey) ?: Craft::t('clicky-analytics', 'Invalid Site ID or Sitekey.')];
         }
 
         return ['success' => true, 'message' => Craft::t('clicky-analytics', 'Connection successful.')];
@@ -747,8 +855,9 @@ class Api extends Component
      */
     public function getPageStats(string $href, string $date, int $visitorLimit = 5): array
     {
-        // Per-page aggregates must go through segmentation; the plain report types
-        // ignore the `href` filter and would return site-wide totals for every page.
+        // Per-page totals must go through segmentation: the tally types ignore
+        // `href` and would return site-wide totals. `visitors-list` does honour
+        // it, so the recent visitors come straight from there.
         $stats = $this->getSegments(
             ['visitors', 'visitors-unique', 'actions', 'bounce-rate', 'time-average', 'traffic-sources'],
             $date,
@@ -765,7 +874,7 @@ class Api extends Component
             'unique' => (int)($stats['visitors-unique'][0]['value'] ?? 0),
             'actions' => (int)($stats['actions'][0]['value'] ?? 0),
             'bounceRate' => (int)round((float)($stats['bounce-rate'][0]['value'] ?? 0)),
-            'time' => $this->_prettyTime((int)($stats['time-average'][0]['value'] ?? 0)),
+            'time' => self::formatDuration((int)($stats['time-average'][0]['value'] ?? 0)),
             'sources' => $stats['traffic-sources'] ?? [],
             'visitorsList' => $this->_normalizeVisitors($items),
         ];
@@ -775,36 +884,70 @@ class Api extends Component
     // =========================================================================
 
     /**
-     * Returns the HTTP client to use for Clicky API calls.
-     *
-     * Returns the injected test client if one was set via {@see setHttpClient()},
-     * otherwise a real Guzzle client configured per Craft's conventions.
+     * Returns the HTTP client to use for Clicky API calls: the injected test
+     * client if one was set via {@see setHttpClient()}, otherwise a Guzzle
+     * client with short timeouts, so a slow Clicky can't hold up the pages
+     * that show its data. A `timeout` or `connect_timeout` in
+     * `config/guzzle.php` takes precedence.
      *
      * @return Client The HTTP client.
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
+    private function _client(): Client
+    {
+        if ($this->_httpClient !== null) {
+            return $this->_httpClient;
+        }
+
+        $guzzleConfig = Craft::$app->getConfig()->getConfigFromFile('guzzle');
+
+        return Craft::createGuzzleClient([
+            'timeout' => $guzzleConfig['timeout'] ?? self::TIMEOUT,
+            'connect_timeout' => $guzzleConfig['connect_timeout'] ?? self::CONNECT_TIMEOUT,
+        ]);
+    }
+
     /**
-     * Takes the sitekey out of a Guzzle error message.
+     * Takes the sitekey out of a message that may carry it.
      *
      * Guzzle puts the whole request URI in the message for any HTTP status
-     * error, and the sitekey rides on every call as a query parameter, so the
-     * raw message is the credential in plain text. It would otherwise go to the
-     * log, and for the connection test back to the browser.
+     * error, and the sitekey rides on every call as a query parameter. The key
+     * is masked wherever it appears as `sitekey=…`, and by value when it's
+     * known, for messages that quote it some other way.
      *
-     * @param string $message The raw error message.
-     * @return string The message with any sitekey value masked.
+     * @param string $message The raw message.
+     * @param string|null $siteKey The sitekey in use, if known.
+     * @return string The message with the sitekey masked.
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.2
      */
-    private static function _redactSitekey(string $message): string
+    private static function _redact(string $message, ?string $siteKey = null): string
     {
-        return preg_replace('/\bsitekey=[^&\s`\'"]+/i', 'sitekey=***', $message) ?? $message;
+        $message = preg_replace('/\bsitekey=[^&\s`\'"]+/i', 'sitekey=***', $message) ?? $message;
+
+        if ($siteKey !== null && $siteKey !== '') {
+            $message = str_replace([$siteKey, rawurlencode($siteKey)], '***', $message);
+        }
+
+        return $message;
     }
 
-    private function _client(): Client
+    /**
+     * Returns the error Clicky reported in a decoded response, or null. Clicky
+     * sends errors with a 200 status, either as `{"error": …}` or wrapped in a
+     * list, `[{"error": …}]`.
+     *
+     * @param array $data The decoded response.
+     * @return string|null The error message, or null if there isn't one.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    private static function _errorMessage(array $data): ?string
     {
-        return $this->_httpClient ?? Craft::createGuzzleClient();
+        $error = $data['error'] ?? $data[0]['error'] ?? null;
+
+        return $error !== null ? (string)$error : null;
     }
 
     /**
@@ -842,7 +985,7 @@ class Api extends Component
                     : ((string)($item['referrer_domain'] ?? '') ?: ucfirst($refType)),
                 'referrerType' => $refType,
                 'actions' => (int)($item['actions'] ?? 0),
-                'duration' => $this->_prettyTime((int)($item['time_total'] ?? 0)),
+                'duration' => self::formatDuration((int)($item['time_total'] ?? 0)),
                 'returning' => (int)($item['total_visits'] ?? 1) > 1,
                 'statsUrl' => self::_safeUrl((string)($item['stats_url'] ?? '')) ?? '',
             ];
@@ -1023,26 +1166,6 @@ class Api extends Component
     }
 
     /**
-     * Formats a number of seconds as a compact "1m 39s" style duration.
-     *
-     * @param int $seconds The duration in seconds.
-     * @return string The formatted duration.
-     * @author John Henry Donovan <info@johnhenry.ie>
-     * @since 1.0.0
-     */
-    private function _prettyTime(int $seconds): string
-    {
-        if ($seconds < 60) {
-            return $seconds . 's';
-        }
-
-        $minutes = intdiv($seconds, 60);
-        $remainder = $seconds % 60;
-
-        return $remainder > 0 ? "{$minutes}m {$remainder}s" : "{$minutes}m";
-    }
-
-    /**
      * Flattens a raw Clicky response into items keyed by report type, decoding
      * HTML-encoded titles and stripping unsafe URLs along the way. Shared by
      * {@see self::getStats()} and {@see self::getSegments()}, whose responses use
@@ -1094,72 +1217,138 @@ class Api extends Component
     /**
      * Performs (and caches) a Clicky API request, returning the decoded array.
      *
+     * A failed request is remembered for {@see FAILURE_BACKOFF} seconds, and
+     * calls in that time fail straight away instead of waiting on Clicky again.
+     * Errors never carry the sitekey, and aren't chained to the HTTP client's
+     * exception, whose message quotes the full request URL.
+     *
      * @param string[] $types The report types to request.
      * @param string $date A Clicky date expression.
      * @param array $params Extra query parameters.
-     * @param bool $bypassCache Whether to skip the cache read/write entirely and always fetch fresh.
+     * @param int|null $cacheDuration How long to cache the response, in seconds: null for the plugin setting,
+     * 0 to skip the cache entirely.
      * @return array The decoded JSON response.
      * @throws RuntimeException if the API is misconfigured or returns an error.
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
-    private function _request(array $types, string $date, array $params = [], bool $bypassCache = false): array
+    private function _request(array $types, string $date, array $params = [], ?int $cacheDuration = null): array
     {
         $settings = ClickyAnalytics::getInstance()->getSettings();
-        $siteId = $settings->getSiteId();
-        $siteKey = $settings->getSiteKey();
+        $siteId = $settings->getSiteId($this->_siteHandle);
+        $siteKey = $settings->getSiteKey($this->_siteHandle);
 
         if ($siteId === null || $siteKey === null) {
             throw new RuntimeException(Craft::t('clicky-analytics', 'Clicky is not configured. Add your Site ID and Sitekey in the plugin settings.'));
         }
 
-        // A cacheDuration of 0 is documented (settings screen and config.php)
-        // as "disable caching". Yii's cache component instead treats a set()
-        // duration of 0 as "never expire" - the opposite - so honour the
-        // documented behaviour explicitly rather than passing 0 straight through.
-        $bypassCache = $bypassCache || $settings->cacheDuration === 0;
+        // A cacheDuration of 0 means "don't cache", where Yii's cache would
+        // read it as "never expire".
+        $cacheDuration ??= $settings->cacheDuration;
 
-        $query = array_merge([
+        // The credentials and the request's own keys go last, so nothing
+        // passed in can replace them.
+        $query = array_merge($params, [
             'site_id' => $siteId,
             'sitekey' => $siteKey,
             'type' => implode(',', $types),
             'date' => $date,
             'output' => 'json',
             'app' => 'craft-clicky-analytics',
-        ], $params);
+        ]);
 
-        $cacheKey = 'clicky-analytics:' . md5(Json::encode([$siteId, $types, $date, $params]));
         $cache = Craft::$app->getCache();
+        $cacheKey = 'clicky-analytics:' . md5(Json::encode([$siteId, $types, $date, $params]));
+        $failureKey = 'clicky-analytics:failed:' . $siteId;
 
-        $cached = $bypassCache ? false : $cache->get($cacheKey);
-        if ($cached !== false) {
-            return $cached;
+        if ($cacheDuration > 0) {
+            $cached = $cache->get($cacheKey);
+            if ($cached !== false) {
+                return $cached;
+            }
+        }
+
+        if ($settings->cacheDuration > 0) {
+            $failure = $cache->get($failureKey);
+            if (is_string($failure)) {
+                throw new RuntimeException($failure);
+            }
         }
 
         try {
             $response = $this->_client()->get(self::ENDPOINT, ['query' => $query]);
             $body = (string)$response->getBody();
         } catch (GuzzleException $e) {
-            $message = self::_redactSitekey($e->getMessage());
+            $message = self::_redact($e->getMessage(), $siteKey);
             Craft::error('Clicky API request failed: ' . $message, 'clicky-analytics');
-            throw new RuntimeException(Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => $message]), 0, $e);
+            $this->_fail(Craft::t('clicky-analytics', 'Could not reach the Clicky API: {message}', ['message' => $message]), $failureKey);
         }
 
         $data = Json::decodeIfJson($body);
 
-        // Clicky surfaces errors either as a plain string or an {error: …} object.
         if (!is_array($data)) {
-            Craft::error('Unexpected Clicky API response: ' . $body, 'clicky-analytics');
-            throw new RuntimeException(Craft::t('clicky-analytics', 'The Clicky API returned an unexpected response. Check your Site ID and Sitekey.'));
+            Craft::error('Unexpected Clicky API response: ' . mb_substr(self::_redact($body, $siteKey), 0, 500), 'clicky-analytics');
+            $this->_fail(Craft::t('clicky-analytics', 'The Clicky API returned an unexpected response. Check your Site ID and Sitekey.'), $failureKey);
         }
 
-        if (isset($data['error'])) {
-            Craft::error('Clicky API error: ' . (string)$data['error'], 'clicky-analytics');
-            throw new RuntimeException(Craft::t('clicky-analytics', 'Clicky API error: {message}', ['message' => (string)$data['error']]));
+        $error = self::_errorMessage($data);
+        if ($error !== null) {
+            $error = self::_redact($error, $siteKey);
+            Craft::error('Clicky API error: ' . $error, 'clicky-analytics');
+            $this->_fail(Craft::t('clicky-analytics', 'Clicky API error: {message}', ['message' => $error]), $failureKey);
         }
 
-        if (!$bypassCache) {
-            $cache->set($cacheKey, $data, $settings->cacheDuration);
+        $data = self::_withoutPrivateVisitorFields($data);
+
+        if ($cacheDuration > 0) {
+            $cache->set($cacheKey, $data, $cacheDuration);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Remembers a failure for {@see FAILURE_BACKOFF} seconds (unless caching is
+     * switched off) and throws it.
+     *
+     * @param string $message The error message, already free of the sitekey.
+     * @param string $failureKey The cache key the failure is remembered under.
+     * @return never
+     * @throws RuntimeException always.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    private function _fail(string $message, string $failureKey): never
+    {
+        if (ClickyAnalytics::getInstance()->getSettings()->cacheDuration > 0) {
+            Craft::$app->getCache()->set($failureKey, $message, self::FAILURE_BACKOFF);
+        }
+
+        throw new RuntimeException($message);
+    }
+
+    /**
+     * Drops the fields from `visitors-list` items that identify a visitor (IP
+     * address, hostname, organisation, coordinates) and that the plugin never
+     * shows, so they aren't stored in Craft's cache.
+     *
+     * @param array $data The decoded response.
+     * @return array The response without those fields.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    private static function _withoutPrivateVisitorFields(array $data): array
+    {
+        foreach ($data as $i => $block) {
+            if (!is_array($block) || ($block['type'] ?? null) !== 'visitors-list') {
+                continue;
+            }
+
+            foreach ($block['dates'] ?? [] as $d => $dateBlock) {
+                foreach ($dateBlock['items'] ?? [] as $n => $item) {
+                    $data[$i]['dates'][$d]['items'][$n] = array_diff_key($item, array_flip(self::PRIVATE_VISITOR_FIELDS));
+                }
+            }
         }
 
         return $data;

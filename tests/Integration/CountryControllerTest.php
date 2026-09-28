@@ -21,7 +21,7 @@ use yii\web\ForbiddenHttpException;
 // ---------------------------------------------------------------------------
 
 describe('CountryController::actionIndex permission', function () {
-    it('refuses a user without the add-widgets permission', function () {
+    it('refuses a user without the view permission', function () {
         $this->actingAs(UserFactory::factory()->create());
 
         $this->http('get', 'admin/actions/clicky-analytics/country?country=Ireland')

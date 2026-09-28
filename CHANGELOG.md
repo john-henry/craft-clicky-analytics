@@ -1,68 +1,84 @@
 # Release Notes for Clicky Analytics
 
+## 1.1.0 - 2026-09-25 [CRITICAL]
+
+> [!IMPORTANT]
+> If your Sitekey is in a variable named `CLICKY_SITEKEY`, Craft has been writing it to your logs. Generate a new Sitekey in Clicky, rename the variable to `CLICKY_SITE_KEY`, and delete your old logs in `storage/logs`.
+
+### Security
+- Craft now masks the Clicky Sitekey in logged request details and the control panel's variable suggestions.
+- Errors from Clicky no longer carry the Sitekey.
+- The shipped config file refers to the Sitekey by variable, so its value no longer appears on the settings screen.
+- Clicky widgets, the Page Stats field and the country drilldown now need the view permission, however the widget was added.
+- Test connection only resolves the saved variables or ones named `CLICKY_`.
+- Visitors' IP addresses, hostnames and coordinates are no longer cached.
+- Links to referrers and landing pages now open with `noreferrer`.
+
+### Added
+- Give each Craft site its own Clicky Site ID and Sitekey with the `sites` config setting.
+- Dashboard widgets have a Clicky site setting, for reporting on a site with its own Site ID and Sitekey.
+- `craft.clickyAnalytics.pageStats()` accepts an entry or a full URL.
+
+### Changed
+- The "Add Clicky Analytics dashboard widgets" permission is now "View Clicky Analytics data", `clicky-analytics:view-analytics`. Existing grants are moved over.
+- Date ranges now follow your Clicky site's time zone rather than Craft's.
+- Calendar months now cover the whole month.
+- The Page Stats field defaults to Last 28 days.
+- Visitors online is cached for 30 seconds rather than fetched on every page.
+- Requests to Clicky time out after 5 seconds, unless `config/guzzle.php` sets a timeout.
+- After a failed request, calls to Clicky pause for a minute.
+- Report widgets are titled with their metric alone.
+- Uninstalling the plugin removes its dashboard widgets.
+
+### Fixed
+- The Page Stats field no longer shows up in GraphQL schemas, where it could only ever return null.
+- A wrong Sitekey no longer passes Test connection.
+- A Clicky outage no longer breaks front-end pages that use `craft.clickyAnalytics`.
+- The Page Stats field can no longer be made required, which stopped every save.
+- The Page Stats field skips unpublished drafts.
+- Pages with non-ASCII characters in their URL now match their Clicky stats.
+- Two line charts on one dashboard no longer share a colour.
+- Line charts in one-column widgets have readable axis labels.
+- "1 visitors online now" and "1 views" now read correctly.
+- Rows without a drilldown in Top Countries line up with the rest.
+- Screen readers now hear which country a drilldown button opens.
+- The drilldown's loading and error messages can now be translated.
+- Invalid Site IDs, date ranges, colour schemes and Report widget options are now rejected.
+- Modules can now add validation rules to the widgets.
+- The "Open in Clicky" links now show when they have keyboard focus, not just on hover.
+- The visitors chart now has a text version for screen readers.
+- The country drilldown toggle now meets the minimum touch target size.
+- The live visitors pulse no longer animates when reduced motion is requested.
+
 ## 1.0.2 - 2026-09-22 [CRITICAL]
 
 ### Security
-- Your Clicky Sitekey no longer ends up in the log file or on screen. The sitekey goes to Clicky as part
-  of the web address on every request, and when a request came back with an error, the message that came
-  with it carried that whole address. It was written to `storage/logs/web.log` as it stood and, if you
-  pressed Test connection on the settings screen, printed straight back into the page. Log files get
-  mailed about, attached to support tickets and swept up in backups, so treat a sitekey that was in one
-  as known and roll it over in your Clicky account. The key is masked now wherever that message goes.
+- Failed Clicky requests no longer write your Sitekey to the logs or show it on screen. If it may have been logged, generate a new one in Clicky.
 
 ### Fixed
-- The Track visitors with JavaScript disabled setting now says that it only applies while the tracking
-  code is being injected. It always did, but nothing on the screen said so.
-- A Site ID or Sitekey set through an environment variable is now trimmed before it is used. A stray
-  space or newline at the end of the value, which is easy to leave in a `.env` file, went straight into
-  the Clicky API request and came back as a failure with nothing obvious to point at.
-- The plugin's settings now fire Craft's `defineRules` event, so a module can add its own validation to
-  them. The settings model was declaring its rules in a way that skipped the event, so a handler you
-  attached to it ran against nothing and your rule was never applied.
+- The noscript setting now says it only applies while tracking code is injected.
+- Site IDs and Sitekeys from environment variables are now trimmed.
+- Modules can now add validation rules to the plugin settings.
 
 ## 1.0.1 - 2026-07-08
 
 ### Fixed
-- The Page Stats field was showing the same site-wide numbers on every entry, so a brand new page
-  with no traffic still looked like it had hundreds of visitors. Each entry now shows the figures for
-  its own page. One thing to know: Clicky only keeps the detailed, per-page data for around the last
-  30 days, so these page figures cover that recent window rather than the full range in the heading.
+- The Page Stats field now shows each entry's own figures, not site-wide ones. Clicky keeps per-page data for about 30 days.
 
 ## 1.0.0 - 2026-07-05
 
-First release. Everything below is here from the off.
-
 ### Added
-- 21 native dashboard widgets you can mix and match: Report (configurable), Live Visitors, Current
-  Visitors, Overview, New vs Returning, Top Pages, Top Sources, Top Referrals, Search Engines, Top
-  Countries, Top Browsers, Operating Systems, Devices, Entry Pages, Exit Pages, Downloads, Goals,
-  Campaigns, Cities, Regions and Screen Resolutions. Each has its own date range and row limit.
-- A configurable Report widget: pick any single metric and draw it as a Counter, Line, Bar or Pie.
-- A Live Visitors widget with a feed of recent visits, each row showing the country flag, location,
-  landing page, browser and OS logos, referrer and dwell time, with a new / returning / both filter.
-- A country drilldown on the Top Countries widget: expand a country to load its cities and regions
-  inline, toggleable per widget.
-- A "consolidate versions" toggle on the Browsers and Operating Systems widgets, so you get one
-  "Google Chrome" row instead of one per version.
-- A Clicky Analytics Page Stats field: drop it onto an entry type's field layout and each entry shows
-  its own analytics (visitors, unique, actions, bounce, average time, traffic sources and recent
-  visitors) right in the editor. It stores nothing; the figures are worked out live from the entry's
-  URL.
-- Self-hosted SVG country flags, browser logos, OS logos and search-engine logos, so the rows look
-  the same on every operating system with no call-out to an external CDN.
-- Five colour schemes, Clicky Analytics (warm), Ocean (blue), Monochrome, Forest (green) and Berry
-  (purple), that re-theme every widget, the field and the charts from the one setting.
-- Compact density and slim bar style options, for when you want the widgets and the field to sit
-  tighter.
-- Optional front-end tracking code injection: the plugin adds the Clicky snippet (with the
-  `<noscript>` pixel fallback) just before `</body>` on every front-end page, using your Site ID.
-  It's skipped automatically when `devMode` is on and on Live Preview or share-token requests, so
-  local development and draft previews never end up in your live stats.
-- A settings screen for your Site ID and Sitekey (both take environment variables) with a Test
-  connection button, plus default date range, cache duration and colour scheme.
-- A `config/clicky-analytics.php` config file (copy it from `src/config.php`) to manage any setting
-  in code. Anything set there overrides the control-panel value and turns that field read-only.
-- "Open in Clicky" deep links on every ranked row, so you can jump straight to the full report.
-- A `craft.clickyAnalytics` Twig variable for reading the same figures in your own templates.
-- An "Add Clicky Analytics dashboard widgets" user permission for non-admins.
-- Per-report response caching with a duration you set (or 0 to turn it off).
+- 21 dashboard widgets, each with its own date range and row limit.
+- A Report widget that draws any metric as a counter, line, bar or pie.
+- A Live Visitors widget with a new, returning or both filter.
+- A cities and regions drilldown on the Top Countries widget.
+- An option to merge browser and OS versions into one row.
+- A Page Stats field that shows an entry's own analytics in the editor.
+- Self-hosted flags and browser, OS and search engine logos.
+- Five colour schemes, a compact density and a slim bar style.
+- Optional tracking code injection, skipped in `devMode` and previews.
+- A settings screen with Test connection, and a `config/clicky-analytics.php` config file.
+- "Open in Clicky" links on every ranked row.
+- A `craft.clickyAnalytics` Twig variable.
+- A permission for adding Clicky widgets.
+- Response caching with a duration you set.

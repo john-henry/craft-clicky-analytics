@@ -5,7 +5,11 @@
             <div class="clicky-counter__label">{{ label }}</div>
         </div>
     {% elseif display == 'line' %}
-        {% include 'clicky-analytics/_components/_lineChart' with { series: series } only %}
+        {% include 'clicky-analytics/_components/_lineChart' with {
+            series: series,
+            compact: compactChart ?? false,
+            label: '{metric} over time'|t('clicky-analytics', { metric: label }),
+        } only %}
     {% elseif display == 'pie' %}
         {% include 'clicky-analytics/_components/_pieChart' with { rows: rows } only %}
     {% else %}

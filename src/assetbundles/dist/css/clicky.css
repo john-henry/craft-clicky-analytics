@@ -252,7 +252,12 @@
     border-radius: 50%;
     background: #1aa658;
     box-shadow: 0 0 0 0 rgba(26, 166, 88, 0.6);
-    animation: clicky-pulse 2s infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .clicky-now__dot {
+        animation: clicky-pulse 2s infinite;
+    }
 }
 
 @keyframes clicky-pulse {
@@ -458,12 +463,20 @@
     transition: opacity 0.1s ease-in-out;
 }
 
-.clicky-rank__item:hover .clicky-rank__ext {
+.clicky-rank__item:hover .clicky-rank__ext,
+.clicky-rank__item:focus-within .clicky-rank__ext,
+.clicky-rank__ext:focus-visible {
     opacity: 1;
 }
 
 .clicky-rank__ext:hover {
     color: var(--clicky-accent, #3b82f6);
+}
+
+.clicky-rank__ext:focus-visible {
+    outline: 2px solid var(--clicky-focus, #3f6dd1);
+    outline-offset: 2px;
+    border-radius: 2px;
 }
 
 .clicky-rank__ext .clicky-icon {
@@ -484,8 +497,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     margin-right: 2px;
     padding: 0;
     border: none;
@@ -493,6 +506,12 @@
     color: var(--light-text-color, #9aa5b1);
     cursor: pointer;
     border-radius: 4px;
+}
+
+.clicky-rank__toggle-spacer {
+    flex: none;
+    width: 24px;
+    margin-right: 2px;
 }
 
 .clicky-rank__toggle:hover {

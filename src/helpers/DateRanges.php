@@ -13,18 +13,19 @@ use DateTimeZone;
 /**
  * Date range helper.
  *
- * Defines the date ranges offered in the dashboard date picker and widget
- * settings, and resolves each to a concrete Clicky `date` value
- * (https://clicky.com/help/api#dates) together with the equal-length preceding
- * period used for trend comparison. Supports relative presets, recent calendar
- * months, and an arbitrary custom range.
+ * Defines the date ranges offered in the widget and field settings, and
+ * resolves each to a Clicky `date` value (https://clicky.com/help/api#dates).
+ * Relative presets are sent as Clicky's own keywords, so "today" is today in
+ * the Clicky site's time zone rather than Craft's; the period they're compared
+ * against is worked out from the range Clicky reports back. Calendar months
+ * are sent as explicit date ranges.
  *
  * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
  */
 abstract class DateRanges
 {
-    // Constants
+    // Const Properties
     // =========================================================================
 
     /**
@@ -32,12 +33,17 @@ abstract class DateRanges
      */
     public const DEFAULT = 'last-7-days';
 
+    /**
+     * @var string Stands in for a comparison period that's worked out from the
+     * range Clicky reports for the current period.
+     */
+    public const PREVIOUS_PERIOD = 'previous-period';
+
     // Public Methods
     // =========================================================================
 
     /**
-     * Returns the relative date presets as `value => label` pairs. These are the
-     * static options offered for widget settings and the plugin default.
+     * Returns the relative date range presets, keyed by their Clicky keyword.
      *
      * @return array<string, string> The relative date range options.
      * @author John Henry Donovan <info@johnhenry.ie>
@@ -58,8 +64,7 @@ abstract class DateRanges
     }
 
     /**
-     * Returns the most recent calendar months as `YYYY-MM => "Mon YYYY"` pairs
-     * (current month plus the two before it).
+     * Returns the current and two previous calendar months, keyed `YYYY-MM`.
      *
      * @return array<string, string> The month options.
      * @author John Henry Donovan <info@johnhenry.ie>
@@ -67,7 +72,7 @@ abstract class DateRanges
      */
     public static function months(): array
     {
-        $month = (new DateTime('first day of this month', self::_tz()));
+        $month = new DateTime('first day of this month', new DateTimeZone(Craft::$app->getTimeZone()));
         $options = [];
 
         for ($i = 0; $i < 3; $i++) {
@@ -79,23 +84,7 @@ abstract class DateRanges
     }
 
     /**
-     * Returns every dashboard date picker option (relative presets, recent
-     * months and the custom-range entry) as `value => label` pairs.
-     *
-     * @return array<string, string> The full set of date range options.
-     * @author John Henry Donovan <info@johnhenry.ie>
-     * @since 1.0.0
-     */
-    public static function options(): array
-    {
-        return self::relativeOptions()
-            + self::months()
-            + ['custom' => Craft::t('clicky-analytics', 'Custom date range…')];
-    }
-
-    /**
-     * Returns the date options offered in widget settings: relative presets and
-     * recent months, but no custom range (widgets are persisted, not interactive).
+     * Returns the date range options offered in widget and field settings.
      *
      * @return array<string, string> The widget date range options.
      * @author John Henry Donovan <info@johnhenry.ie>
@@ -107,7 +96,7 @@ abstract class DateRanges
     }
 
     /**
-     * Returns whether the given value is a recognised range key.
+     * Returns whether a value is a recognised range key.
      *
      * @param string|null $value The candidate value.
      * @return bool Whether it is recognised.
@@ -120,13 +109,11 @@ abstract class DateRanges
             return false;
         }
 
-        return isset(self::relativeOptions()[$value])
-            || $value === 'custom'
-            || preg_match('/^\d{4}-\d{2}$/', $value) === 1;
+        return isset(self::relativeOptions()[$value]) || self::_isMonth($value);
     }
 
     /**
-     * Normalises a candidate range key, falling back to the given default.
+     * Returns the value if it's a recognised range key, otherwise the default.
      *
      * @param string|null $value The candidate value.
      * @param string $default The fallback value.
@@ -144,132 +131,95 @@ abstract class DateRanges
     }
 
     /**
-     * Resolves a range key (plus optional custom start/end) to concrete Clicky
-     * date values for the period, its preceding comparison period, and a label.
+     * Returns whether a value is a date Clicky accepts from a caller: a range
+     * key, or a `YYYY-MM-DD` date or `YYYY-MM-DD,YYYY-MM-DD` range. Clicky
+     * treats anything else as today without saying so.
      *
-     * @param string $key A range key (relative, `YYYY-MM`, or `custom`).
-     * @param string|null $start A `Y-m-d` start date (custom ranges only).
-     * @param string|null $end A `Y-m-d` end date (custom ranges only).
-     * @return array{date: string, previous: string, label: string, start: string, end: string} The resolved range.
+     * @param string $value The candidate value.
+     * @return bool Whether it is accepted.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    public static function isClickyDate(string $value): bool
+    {
+        return self::isValid($value) || preg_match('/^\d{4}-\d{2}-\d{2}(,\d{4}-\d{2}-\d{2})?$/', $value) === 1;
+    }
+
+    /**
+     * Resolves a range key to the Clicky date to request, what to compare it
+     * with, and its label.
+     *
+     * @param string $key A range key (relative preset or `YYYY-MM`).
+     * @return array{date: string, previous: string, label: string} The resolved range.
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
-    public static function resolve(string $key, ?string $start = null, ?string $end = null): array
+    public static function resolve(string $key): array
     {
-        [$from, $to] = self::_bounds($key, $start, $end);
+        if (self::_isMonth($key)) {
+            $from = new DateTime($key . '-01');
+            $to = (clone $from)->modify('last day of this month');
+            $prevFrom = (clone $from)->modify('-1 month');
+            $prevTo = (clone $prevFrom)->modify('last day of this month');
 
-        $startStr = $from->format('Y-m-d');
-        $endStr = $to->format('Y-m-d');
+            return [
+                'date' => $from->format('Y-m-d') . ',' . $to->format('Y-m-d'),
+                'previous' => $prevFrom->format('Y-m-d') . ',' . $prevTo->format('Y-m-d'),
+                'label' => self::months()[$key] ?? $from->format('M Y'),
+            ];
+        }
 
-        // Equal-length window immediately before this one, for trends.
+        $key = isset(self::relativeOptions()[$key]) ? $key : self::DEFAULT;
+
+        return [
+            'date' => $key,
+            'previous' => self::PREVIOUS_PERIOD,
+            'label' => self::relativeOptions()[$key],
+        ];
+    }
+
+    /**
+     * Returns the equal-length period immediately before a Clicky date range,
+     * as a Clicky date. Takes the range as Clicky reports it (`YYYY-MM-DD` or
+     * `YYYY-MM-DD,YYYY-MM-DD`), which is already in the Clicky site's time zone.
+     *
+     * @param string $range The reported range.
+     * @return string|null The preceding period, or null if the range can't be read.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    public static function precedingPeriod(string $range): ?string
+    {
+        $parts = explode(',', $range);
+        $from = DateTime::createFromFormat('!Y-m-d', $parts[0]);
+        $to = DateTime::createFromFormat('!Y-m-d', $parts[1] ?? $parts[0]);
+
+        if ($from === false || $to === false || $from > $to) {
+            return null;
+        }
+
         $length = (int)$from->diff($to)->format('%a') + 1;
         $prevTo = (clone $from)->modify('-1 day');
         $prevFrom = (clone $prevTo)->modify('-' . ($length - 1) . ' days');
 
-        if ($key === 'custom') {
-            $label = $from->format('j M Y') . ' – ' . $to->format('j M Y');
-        } else {
-            $label = self::options()[$key] ?? $key;
-        }
-
-        return [
-            'date' => self::_format($startStr, $endStr),
-            'previous' => self::_format($prevFrom->format('Y-m-d'), $prevTo->format('Y-m-d')),
-            'label' => $label,
-            'start' => $startStr,
-            'end' => $endStr,
-        ];
+        return $length === 1
+            ? $prevTo->format('Y-m-d')
+            : $prevFrom->format('Y-m-d') . ',' . $prevTo->format('Y-m-d');
     }
 
     // Private Methods
     // =========================================================================
 
     /**
-     * Returns the [start, end] DateTime bounds for a range key, capping the end
-     * at today and falling back to the default range when input is invalid.
+     * Returns whether a value is a `YYYY-MM` month key.
      *
-     * @param string $key A range key.
-     * @param string|null $start A custom `Y-m-d` start date.
-     * @param string|null $end A custom `Y-m-d` end date.
-     * @return array{0: DateTime, 1: DateTime} The start and end bounds.
+     * @param string $value The candidate value.
+     * @return bool Whether it is a month key.
      * @author John Henry Donovan <info@johnhenry.ie>
-     * @since 1.0.0
+     * @since 1.1.0
      */
-    private static function _bounds(string $key, ?string $start, ?string $end): array
+    private static function _isMonth(string $value): bool
     {
-        $tz = self::_tz();
-        $today = new DateTime('today', $tz);
-
-        // Custom range: validate both dates, swap if reversed, cap at today.
-        if ($key === 'custom') {
-            $from = $start !== null ? DateTime::createFromFormat('Y-m-d', $start, $tz) : false;
-            $to = $end !== null ? DateTime::createFromFormat('Y-m-d', $end, $tz) : false;
-
-            if ($from === false || $to === false) {
-                return [(clone $today)->modify('-6 days'), $today];
-            }
-
-            $from->setTime(0, 0);
-            $to->setTime(0, 0);
-
-            if ($from > $to) {
-                [$from, $to] = [$to, $from];
-            }
-            if ($to > $today) {
-                $to = $today;
-            }
-
-            return [$from, $to];
-        }
-
-        // A specific calendar month (YYYY-MM).
-        if (preg_match('/^\d{4}-\d{2}$/', $key) === 1) {
-            $from = DateTime::createFromFormat('Y-m-d', $key . '-01', $tz);
-            if ($from === false) {
-                return [(clone $today)->modify('-6 days'), $today];
-            }
-            $from->setTime(0, 0);
-            $to = (clone $from)->modify('last day of this month');
-
-            return [$from, $to > $today ? $today : $to];
-        }
-
-        // Relative presets.
-        return match ($key) {
-            'today' => [$today, $today],
-            'yesterday' => [(clone $today)->modify('-1 day'), (clone $today)->modify('-1 day')],
-            '2-days-ago' => [(clone $today)->modify('-2 days'), (clone $today)->modify('-2 days')],
-            'last-14-days' => [(clone $today)->modify('-13 days'), $today],
-            'last-28-days' => [(clone $today)->modify('-27 days'), $today],
-            'last-60-days' => [(clone $today)->modify('-59 days'), $today],
-            'last-90-days' => [(clone $today)->modify('-89 days'), $today],
-            default => [(clone $today)->modify('-6 days'), $today],
-        };
-    }
-
-    /**
-     * Formats a start/end pair as a Clicky `date` value (single date or range).
-     *
-     * @param string $start A `Y-m-d` start date.
-     * @param string $end A `Y-m-d` end date.
-     * @return string The Clicky date expression.
-     * @author John Henry Donovan <info@johnhenry.ie>
-     * @since 1.0.0
-     */
-    private static function _format(string $start, string $end): string
-    {
-        return $start === $end ? $start : $start . ',' . $end;
-    }
-
-    /**
-     * Returns the site time zone.
-     *
-     * @return DateTimeZone The site time zone.
-     * @author John Henry Donovan <info@johnhenry.ie>
-     * @since 1.0.0
-     */
-    private static function _tz(): DateTimeZone
-    {
-        return new DateTimeZone(Craft::$app->getTimeZone());
+        return preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $value) === 1;
     }
 }

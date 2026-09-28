@@ -7,7 +7,6 @@
 namespace johnhenry\clickyanalytics\widgets;
 
 use Craft;
-use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\Palette;
 
 /**
@@ -25,6 +24,9 @@ class NewVsReturning extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public static function displayName(): string
     {
@@ -36,6 +38,9 @@ class NewVsReturning extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public function getTitle(): string
     {
@@ -47,6 +52,9 @@ class NewVsReturning extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyTemplate(): string
     {
@@ -55,11 +63,14 @@ class NewVsReturning extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyData(): array
     {
         return [
-            'data' => ClickyAnalytics::getInstance()->getApi()->getNewVsReturning($this->resolveRange()),
+            'data' => $this->api()->getNewVsReturning($this->resolveRange()),
             'accent' => Palette::primary(),
             'secondary' => Palette::secondary(),
         ];

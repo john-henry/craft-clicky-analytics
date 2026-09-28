@@ -64,24 +64,24 @@ describe('Api::_metric()', function () {
 });
 
 // ---------------------------------------------------------------------------
-// _prettyTime(): duration formatting
+// formatDuration(): duration formatting
 // ---------------------------------------------------------------------------
 
-describe('Api::_prettyTime()', function () {
+describe('Api::formatDuration()', function () {
     it('formats sub-minute durations in seconds', function () {
-        expect(invokeApi('_prettyTime', [45]))->toBe('45s');
+        expect(\johnhenry\clickyanalytics\services\Api::formatDuration(45))->toBe('45s');
     });
 
     it('formats a whole number of minutes without seconds', function () {
-        expect(invokeApi('_prettyTime', [60]))->toBe('1m');
+        expect(\johnhenry\clickyanalytics\services\Api::formatDuration(60))->toBe('1m');
     });
 
     it('formats minutes and seconds', function () {
-        expect(invokeApi('_prettyTime', [99]))->toBe('1m 39s');
+        expect(\johnhenry\clickyanalytics\services\Api::formatDuration(99))->toBe('1m 39s');
     });
 
     it('keeps counting in minutes past an hour', function () {
-        expect(invokeApi('_prettyTime', [3600]))->toBe('60m');
+        expect(\johnhenry\clickyanalytics\services\Api::formatDuration(3600))->toBe('60m');
     });
 });
 

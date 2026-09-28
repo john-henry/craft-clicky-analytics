@@ -17,15 +17,17 @@ tests/
 │   ├── SearchEnginesTest.php         # SearchEngines::match() brand + regional domains
 │   ├── FlagsTest.php                 # Flags::code() ISO mapping, "the" stripping, aliases
 │   ├── SettingsTest.php              # Settings defaults + required credentials + cacheDuration
-│   ├── ApiHelpersTest.php            # Api private helpers via reflection: metric/prettyTime/countryKey/consolidate/filterByCountry
+│   ├── ApiHelpersTest.php            # Api private helpers via reflection: metric/formatDuration/countryKey/consolidate/filterByCountry
 │   └── TrackingCodeTest.php          # TrackingCode::html(): script tag, HTML encoding, noscript fallback
 └── Integration/
-    ├── DateRangesTest.php            # isValid/normalize/resolve: bounds, custom swap/cap, previous period
+    ├── DateRangesTest.php            # isValid/normalize/resolve: Clicky keywords, months, the preceding period
     ├── PaletteTest.php               # schemes/swatches + per-scheme primary/accent/pie + invalid fallback
     ├── SettingsEnvTest.php           # getSiteId()/getSiteKey() literal + $ENV_VAR resolution
     ├── WidgetSettingsTest.php        # inherited widget settings (dateRange, limit) serialise + round-trip
     ├── ApiTest.php                   # public Api methods via cache-seeded (no-HTTP) responses
-    └── ApiHttpErrorsTest.php         # _request()/ping() over a mocked Guzzle client: success + failure paths
+    ├── ApiHttpErrorsTest.php         # _request()/ping() over a mocked Guzzle client: success + failure paths
+    ├── SitekeyRedactionTest.php      # the Sitekey stays out of error messages and the connection test
+    └── SafeguardsTest.php            # secrets, the view permission, failure handling, validation
 ```
 
 ## Running
@@ -33,23 +35,17 @@ tests/
 From the parent Craft project (not from inside the plugin folder):
 
 ```bash
-ddev exec vendor/bin/pest plugins/craft-clicky-analytics/tests \
-  --test-directory=plugins/craft-clicky-analytics/tests
+ddev exec composer test:ca
 ```
 
-To run a single suite:
+To filter to a specific test file, pass Pest's `--filter` through:
 
 ```bash
-ddev exec vendor/bin/pest plugins/craft-clicky-analytics/tests/Feature
-ddev exec vendor/bin/pest plugins/craft-clicky-analytics/tests/Integration
+ddev exec composer test:ca -- --filter=DateRanges
 ```
 
-To filter to a specific test file:
-
-```bash
-ddev exec vendor/bin/pest plugins/craft-clicky-analytics/tests \
-  --test-directory=plugins/craft-clicky-analytics/tests --filter=DateRanges
-```
+Always go through `composer test:ca`, which passes `--test-directory`. Without it Pest skips `Pest.php`, so
+`RefreshesDatabase` never binds and the tests write to your development database.
 
 ## Adding tests
 

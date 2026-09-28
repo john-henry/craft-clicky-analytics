@@ -8,12 +8,14 @@ namespace johnhenry\clickyanalytics\base;
 
 use Craft;
 use craft\base\Model;
+use craft\db\Table;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\services\Dashboard;
 use craft\services\Fields;
 use craft\services\UserPermissions;
 use craft\web\twig\variables\CraftVariable;
+use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\fields\PageStats;
 use johnhenry\clickyanalytics\helpers\DateRanges;
 use johnhenry\clickyanalytics\helpers\Palette;
@@ -89,8 +91,78 @@ trait PluginTrait
         ]);
     }
 
+    /**
+     * Removes the plugin's dashboard widgets once it's uninstalled, so users
+     * aren't left with widgets whose class no longer exists.
+     *
+     * @return void
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    protected function afterUninstall(): void
+    {
+        Craft::$app->getDb()->createCommand()
+            ->delete(Table::WIDGETS, ['type' => self::_widgetTypes()])
+            ->execute();
+
+        parent::afterUninstall();
+    }
+
     // Private Methods
     // =========================================================================
+
+    /**
+     * Returns the plugin's dashboard widget classes, in the order they're offered.
+     *
+     * @return string[] The widget classes.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    private static function _widgetTypes(): array
+    {
+        return [
+            ReportWidget::class,
+            LiveVisitors::class,
+            CurrentVisitors::class,
+            Overview::class,
+            NewVsReturning::class,
+            TopPages::class,
+            TopSources::class,
+            TopReferrers::class,
+            SearchEngines::class,
+            TopCountries::class,
+            TopBrowsers::class,
+            OperatingSystems::class,
+            Devices::class,
+            EntryPages::class,
+            ExitPages::class,
+            Downloads::class,
+            Goals::class,
+            Campaigns::class,
+            Cities::class,
+            Regions::class,
+            ScreenResolutions::class,
+        ];
+    }
+
+    /**
+     * Adds "sitekey" to the words Craft treats as secret, so a Clicky Sitekey
+     * in an environment variable is masked in logged request context and the
+     * CP's environment-variable suggestions. Craft only masks names containing
+     * one of its words, and `CLICKY_SITEKEY` has none.
+     *
+     * @return void
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    private function _registerSensitiveKeywords(): void
+    {
+        $security = Craft::$app->getSecurity();
+
+        if (!in_array('sitekey', $security->sensitiveKeywords, true)) {
+            $security->sensitiveKeywords[] = 'sitekey';
+        }
+    }
 
     /**
      * Registers the plugin's dashboard widgets.
@@ -105,27 +177,7 @@ trait PluginTrait
             Dashboard::class,
             Dashboard::EVENT_REGISTER_WIDGET_TYPES,
             static function(RegisterComponentTypesEvent $event) {
-                $event->types[] = ReportWidget::class;
-                $event->types[] = LiveVisitors::class;
-                $event->types[] = CurrentVisitors::class;
-                $event->types[] = Overview::class;
-                $event->types[] = NewVsReturning::class;
-                $event->types[] = TopPages::class;
-                $event->types[] = TopSources::class;
-                $event->types[] = TopReferrers::class;
-                $event->types[] = SearchEngines::class;
-                $event->types[] = TopCountries::class;
-                $event->types[] = TopBrowsers::class;
-                $event->types[] = OperatingSystems::class;
-                $event->types[] = Devices::class;
-                $event->types[] = EntryPages::class;
-                $event->types[] = ExitPages::class;
-                $event->types[] = Downloads::class;
-                $event->types[] = Goals::class;
-                $event->types[] = Campaigns::class;
-                $event->types[] = Cities::class;
-                $event->types[] = Regions::class;
-                $event->types[] = ScreenResolutions::class;
+                array_push($event->types, ...self::_widgetTypes());
             }
         );
     }
@@ -196,7 +248,7 @@ trait PluginTrait
         }
 
         $settings = $this->getSettings();
-        $siteId = $settings->getSiteId();
+        $siteId = $settings->getSiteId(Craft::$app->getSites()->getCurrentSite()->handle);
 
         if (!$settings->injectTrackingCode || $siteId === null) {
             return;
@@ -221,8 +273,8 @@ trait PluginTrait
                 $event->permissions[] = [
                     'heading' => Craft::t('clicky-analytics', 'Clicky Analytics'),
                     'permissions' => [
-                        'clicky-analytics:addWidgets' => [
-                            'label' => Craft::t('clicky-analytics', 'Add Clicky Analytics dashboard widgets'),
+                        ClickyAnalytics::PERMISSION_VIEW_ANALYTICS => [
+                            'label' => Craft::t('clicky-analytics', 'View Clicky Analytics data and add its dashboard widgets'),
                         ],
                     ],
                 ];

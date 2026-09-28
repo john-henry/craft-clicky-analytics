@@ -7,7 +7,6 @@
 namespace johnhenry\clickyanalytics\widgets;
 
 use Craft;
-use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\Palette;
 
 /**
@@ -24,6 +23,45 @@ class TopBrowsers extends BaseListWidget
     // =========================================================================
 
     /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function showConsolidate(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function bodyTemplate(): string
+    {
+        return 'clicky-analytics/_components/widgets/_list';
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function bodyData(): array
+    {
+        return [
+            'rows' => $this->api()->getTopBrowsers($this->resolveRange(), $this->limit, $this->consolidate),
+            'accent' => Palette::accent('browsers'),
+        ];
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
      * @var bool Whether to merge browser versions into one row each.
      */
     public bool $consolidate = true;
@@ -33,6 +71,9 @@ class TopBrowsers extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public static function displayName(): string
     {
@@ -44,20 +85,13 @@ class TopBrowsers extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public function getTitle(): string
     {
         return Craft::t('clicky-analytics', 'Top Browsers');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rules(): array
-    {
-        $rules = parent::rules();
-        $rules[] = [['consolidate'], 'boolean'];
-        return $rules;
     }
 
     // Protected Methods
@@ -65,28 +99,14 @@ class TopBrowsers extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
-    protected function showConsolidate(): bool
+    protected function defineRules(): array
     {
-        return true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function bodyTemplate(): string
-    {
-        return 'clicky-analytics/_components/widgets/_list';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function bodyData(): array
-    {
-        return [
-            'rows' => ClickyAnalytics::getInstance()->getApi()->getTopBrowsers($this->resolveRange(), $this->limit, $this->consolidate),
-            'accent' => Palette::accent('browsers'),
-        ];
+        $rules = parent::defineRules();
+        $rules[] = [['consolidate'], 'boolean'];
+        return $rules;
     }
 }

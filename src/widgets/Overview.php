@@ -7,7 +7,6 @@
 namespace johnhenry\clickyanalytics\widgets;
 
 use Craft;
-use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\Palette;
 
 /**
@@ -26,6 +25,9 @@ class Overview extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public static function displayName(): string
     {
@@ -37,6 +39,9 @@ class Overview extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public function getTitle(): string
     {
@@ -48,6 +53,9 @@ class Overview extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyTemplate(): string
     {
@@ -56,15 +64,19 @@ class Overview extends BaseStatsWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyData(): array
     {
-        $api = ClickyAnalytics::getInstance()->getApi();
+        $api = $this->api();
         $resolved = $this->resolved();
 
         return [
             'overview' => $api->getOverview($resolved['date'], $resolved['previous']),
             'series' => $api->getDailySeries('visitors', $resolved['date']),
+            'compactChart' => ($this->colspan ?? 1) < 2,
             'accent' => Palette::primary(),
             'soft' => Palette::soft(),
         ];

@@ -8,12 +8,13 @@ namespace johnhenry\clickyanalytics\assetbundles;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
+use craft\web\View;
 
 /**
  * Clicky Analytics control panel asset bundle.
  *
- * Registers the dashboard's styles and the small script that swaps the dashboard
- * body when the date-range picker changes.
+ * Registers the widget and field styles, and the script behind the Top
+ * Countries drilldown.
  *
  * @author John Henry Donovan <info@johnhenry.ie>
  * @since 1.0.0
@@ -47,5 +48,24 @@ class ClickyAsset extends AssetBundle
         ];
 
         parent::init();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param View $view The view the bundle is registered on.
+     * @return void
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.1.0
+     */
+    public function registerAssetFiles($view): void
+    {
+        parent::registerAssetFiles($view);
+
+        $view->registerTranslations('clicky-analytics', [
+            'Loading…',
+            'Couldn’t load this country.',
+            'Request failed.',
+        ]);
     }
 }

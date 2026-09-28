@@ -7,7 +7,6 @@
 namespace johnhenry\clickyanalytics\widgets;
 
 use Craft;
-use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\Palette;
 
 /**
@@ -25,6 +24,45 @@ class OperatingSystems extends BaseListWidget
     // =========================================================================
 
     /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function showConsolidate(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function bodyTemplate(): string
+    {
+        return 'clicky-analytics/_components/widgets/_list';
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function bodyData(): array
+    {
+        return [
+            'rows' => $this->api()->getTopOperatingSystems($this->resolveRange(), $this->limit, $this->consolidate),
+            'accent' => Palette::accent('os'),
+        ];
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
      * @var bool Whether to merge operating-system versions into one row each.
      */
     public bool $consolidate = true;
@@ -34,6 +72,9 @@ class OperatingSystems extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public static function displayName(): string
     {
@@ -45,20 +86,13 @@ class OperatingSystems extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public function getTitle(): string
     {
         return Craft::t('clicky-analytics', 'Top Operating Systems');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rules(): array
-    {
-        $rules = parent::rules();
-        $rules[] = [['consolidate'], 'boolean'];
-        return $rules;
     }
 
     // Protected Methods
@@ -66,28 +100,14 @@ class OperatingSystems extends BaseListWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
-    protected function showConsolidate(): bool
+    protected function defineRules(): array
     {
-        return true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function bodyTemplate(): string
-    {
-        return 'clicky-analytics/_components/widgets/_list';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function bodyData(): array
-    {
-        return [
-            'rows' => ClickyAnalytics::getInstance()->getApi()->getTopOperatingSystems($this->resolveRange(), $this->limit, $this->consolidate),
-            'accent' => Palette::accent('os'),
-        ];
+        $rules = parent::defineRules();
+        $rules[] = [['consolidate'], 'boolean'];
+        return $rules;
     }
 }

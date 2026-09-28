@@ -1,5 +1,5 @@
 <div class="clicky-widget clicky-now {{ clickyUiClass|default('') }}">
     <span class="clicky-now__dot"></span>
     <span class="clicky-now__value">{{ visitorsOnline|number }}</span>
-    <span class="clicky-now__label">{{ 'visitors online now'|t('clicky-analytics') }}</span>
+    <span class="clicky-now__label">{{ '{count, plural, =1{visitor} other{visitors}} online now'|t('clicky-analytics', { count: visitorsOnline }) }}</span>
 </div>

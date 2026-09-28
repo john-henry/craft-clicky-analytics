@@ -7,7 +7,6 @@
 namespace johnhenry\clickyanalytics\widgets;
 
 use Craft;
-use johnhenry\clickyanalytics\ClickyAnalytics;
 
 /**
  * Live Visitors widget.
@@ -25,6 +24,36 @@ class LiveVisitors extends BaseWidget
     // =========================================================================
 
     /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    public function getSettingsHtml(): ?string
+    {
+        return $this->siteSettingHtml() . Craft::$app->getView()->renderTemplate('clicky-analytics/_components/widgets/_liveSettings', [
+            'widget' => $this,
+        ]);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
+     */
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+        $rules[] = [['limit'], 'integer', 'min' => 1, 'max' => 100];
+        $rules[] = [['filter'], 'in', 'range' => ['all', 'new', 'returning']];
+        return $rules;
+    }
+
+    /**
      * @var int How many visitors to show.
      */
     public int $limit = 10;
@@ -39,6 +68,9 @@ class LiveVisitors extends BaseWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public static function displayName(): string
     {
@@ -50,6 +82,9 @@ class LiveVisitors extends BaseWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     public function getTitle(): string
     {
@@ -58,30 +93,9 @@ class LiveVisitors extends BaseWidget
 
     /**
      * @inheritdoc
-     */
-    public function rules(): array
-    {
-        $rules = parent::rules();
-        $rules[] = [['limit'], 'integer', 'min' => 1, 'max' => 100];
-        $rules[] = [['filter'], 'in', 'range' => ['all', 'new', 'returning']];
-        return $rules;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSettingsHtml(): ?string
-    {
-        return Craft::$app->getView()->renderTemplate('clicky-analytics/_components/widgets/_liveSettings', [
-            'widget' => $this,
-        ]);
-    }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyTemplate(): string
     {
@@ -90,11 +104,14 @@ class LiveVisitors extends BaseWidget
 
     /**
      * @inheritdoc
+     *
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.0.0
      */
     protected function bodyData(): array
     {
         // Pull a deeper pool so filtering still yields enough rows.
-        $pool = ClickyAnalytics::getInstance()->getApi()->getRecentVisitors('last-7-days', max(50, $this->limit));
+        $pool = $this->api()->getRecentVisitors('last-7-days', max(50, $this->limit));
 
         if ($this->filter === 'new') {
             $pool = array_filter($pool, static fn(array $v): bool => !$v['returning']);

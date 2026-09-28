@@ -17,7 +17,7 @@
                         </span>
                     </div>
                     <div class="clicky-feed__page">
-                        <a href="{{ v.landingPage }}" target="_blank" rel="noopener" title="{{ v.landingPage }}">{{ v.landingPath }}</a>
+                        <a href="{{ v.landingPage }}" target="_blank" rel="noopener noreferrer" title="{{ v.landingPage }}">{{ v.landingPath }}</a>
                     </div>
                 </div>
                 {% if v.browserLogo or v.osLogo %}
@@ -29,7 +29,7 @@
                 {% endif %}
                 <div class="clicky-feed__meta">
                     <span class="clicky-feed__ago">{{ v.ago }}</span>
-                    <span class="clicky-feed__stats">{{ v.referrerLabel }} · {{ v.actions }} {{ 'views'|t('clicky-analytics') }} · {{ v.duration }}</span>
+                    <span class="clicky-feed__stats">{{ v.referrerLabel }} · {{ '{count, plural, =1{# view} other{# views}}'|t('clicky-analytics', { count: v.actions }) }} · {{ v.duration }}</span>
                 </div>
             </li>
         {% endfor %}
