@@ -37,6 +37,8 @@ widgets show the whole site, all read from the [Clicky API](https://clicky.com/h
   no need to paste it into your layout by hand. Skipped automatically when `devMode` is on.
 - **Twig variable:** read any of the same data in your own templates via `craft.clickyAnalytics`. If
   Clicky can't be reached it hands back empty results, so your pages stay up.
+- **Tools for AI agents:** on Craft 5.12 and later and on Craft 6, three read-only tools on Craft's MCP server let an
+  agent read the overview, any ranked report and a single page's stats. No individual visitor data.
 - **One permission:** a single "View Clicky Analytics data" permission decides who sees the widgets,
   the Page Stats field and the drilldown.
 - **More than one Clicky site:** give each Craft site its own Clicky Site ID and Sitekey in the config
@@ -61,7 +63,7 @@ Full documentation is at [johnhenry.ie/plugins/clicky-analytics/docs](https://jo
 
 ## Requirements
 
-- Craft CMS 5.0 or later
+- Craft CMS 5.0 or later, or Craft CMS 6 with the `craftcms/yii2-adapter` package installed
 - PHP 8.2 or later
 - A Clicky account with API access (Site ID and Sitekey)
 

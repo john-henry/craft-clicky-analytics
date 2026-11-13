@@ -5,3 +5,11 @@ parameters:
     level: 5
     paths:
         - src
+    ignoreErrors:
+        # Craft 6 only: these exist once the plugin runs under Laravel.
+        -
+            identifier: attribute.notFound
+            path: src/mcp/Capabilities.php
+        -
+            identifier: function.notFound
+            path: src/base/PluginTrait.php

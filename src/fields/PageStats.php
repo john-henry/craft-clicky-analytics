@@ -10,6 +10,7 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\models\GqlSchema;
+use CraftCms\Cms\Cp\Icons;
 use johnhenry\clickyanalytics\assetbundles\ClickyAsset;
 use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\helpers\DateRanges;
@@ -74,11 +75,18 @@ class PageStats extends Field
     /**
      * @inheritdoc
      *
+     * Craft 6's field type menu takes the name of one of Craft's own icons and
+     * shows nothing for a file path, so the plugin's icon is only used on Craft 5.
+     *
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
     public static function icon(): string
     {
+        if (class_exists(Icons::class)) {
+            return 'chart-line';
+        }
+
         return dirname(__DIR__) . '/icon-mask.svg';
     }
 
@@ -131,7 +139,10 @@ class PageStats extends Field
      */
     public function getSettingsHtml(): ?string
     {
-        return Craft::$app->getView()->renderTemplate('clicky-analytics/_components/field/settings', [
+        $view = Craft::$app->getView();
+        $view->registerAssetBundle(ClickyAsset::class);
+
+        return $view->renderTemplate('clicky-analytics/_components/field/settings', [
             'field' => $this,
             'rangeOptions' => DateRanges::widgetOptions(),
         ]);

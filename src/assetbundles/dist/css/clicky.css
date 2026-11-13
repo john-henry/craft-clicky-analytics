@@ -146,6 +146,14 @@
     font-weight: 500;
 }
 
+/* Craft 6 renders a plugin's settings, or a field type's, as one block inside
+   its field group, so the group's gap never reaches the fields within it. The
+   element only exists on Craft 6. */
+craft-legacy-html-control:has(> .clicky-settings-field) {
+    display: grid;
+    gap: 24px;
+}
+
 .clicky-test-result {
     margin-left: 10px;
     font-weight: 500;
@@ -792,6 +800,13 @@
     text-overflow: ellipsis;
 }
 
+/* The location gives way, with an ellipsis, so the badge after it always fits. */
+.clicky-feed__loc > :first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .clicky-feed__page {
     color: var(--medium-text-color, #7a7f87);
     white-space: nowrap;
@@ -837,6 +852,15 @@
     text-overflow: ellipsis;
 }
 
+.clicky-feed__online {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #1aa658;
+}
+
 .clicky-feed__stats {
     font-size: 11.5px;
     color: var(--light-text-color, #9aa5b1);
@@ -876,5 +900,9 @@
 @container clicky-feed (max-width: 420px) {
     .clicky-feed__tech {
         display: none;
+    }
+
+    .clicky-feed__row {
+        column-gap: 10px;
     }
 }

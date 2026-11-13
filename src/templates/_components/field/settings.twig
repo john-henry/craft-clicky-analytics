@@ -1,6 +1,7 @@
 {% import '_includes/forms' as forms %}
 
 {{ forms.selectField({
+    fieldClass: 'clicky-settings-field',
     label: 'Date range'|t('clicky-analytics'),
     instructions: 'The period the page stats cover.'|t('clicky-analytics'),
     id: 'dateRange',

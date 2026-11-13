@@ -8,6 +8,7 @@
         {% include 'clicky-analytics/_components/_lineChart' with {
             series: series,
             compact: compactChart ?? false,
+            wide: wideChart ?? false,
             label: '{metric} over time'|t('clicky-analytics', { metric: label }),
         } only %}
     {% elseif display == 'pie' %}

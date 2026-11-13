@@ -77,6 +77,7 @@ class Overview extends BaseStatsWidget
             'overview' => $api->getOverview($resolved['date'], $resolved['previous']),
             'series' => $api->getDailySeries('visitors', $resolved['date']),
             'compactChart' => ($this->colspan ?? 1) < 2,
+            'wideChart' => ($this->colspan ?? 1) > 2,
             'accent' => Palette::primary(),
             'soft' => Palette::soft(),
         ];

@@ -11,7 +11,7 @@
                 </span>
                 <div class="clicky-feed__who">
                     <div class="clicky-feed__loc">
-                        <span>{{ v.geolocation }}</span>
+                        <span title="{{ v.geolocation }}">{{ v.geolocation }}</span>
                         <span class="clicky-feed__badge clicky-feed__badge--{{ v.returning ? 'returning' : 'new' }}">
                             {{ v.returning ? 'Returning'|t('clicky-analytics') : 'New'|t('clicky-analytics') }}
                         </span>
@@ -28,7 +28,12 @@
                 </div>
                 {% endif %}
                 <div class="clicky-feed__meta">
-                    <span class="clicky-feed__ago">{{ v.ago }}</span>
+                    <span class="clicky-feed__ago">
+                        {%- if v.online ?? false -%}
+                            <span class="clicky-feed__online" title="{{ 'Online now'|t('clicky-analytics') }}"></span><span class="visually-hidden">{{ 'Online now'|t('clicky-analytics') }}, </span>
+                        {%- endif -%}
+                        {{ v.ago }}
+                    </span>
                     <span class="clicky-feed__stats">{{ v.referrerLabel }} · {{ '{count, plural, =1{# view} other{# views}}'|t('clicky-analytics', { count: v.actions }) }} · {{ v.duration }}</span>
                 </div>
             </li>

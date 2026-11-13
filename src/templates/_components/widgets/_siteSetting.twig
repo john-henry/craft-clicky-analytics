@@ -1,6 +1,7 @@
 {% import '_includes/forms' as forms %}
 
 {{ forms.selectField({
+    fieldClass: 'clicky-settings-field',
     label: 'Clicky site'|t('clicky-analytics'),
     instructions: 'Which Clicky site to report on. Sites with their own Clicky credentials are listed.'|t('clicky-analytics'),
     id: 'siteHandle',

@@ -52,9 +52,14 @@ class Api extends Component
     public const FAILURE_BACKOFF = 60;
 
     /**
-     * @var int How long, in seconds, the visitors-online count is cached.
+     * @var int How long, in seconds, the visitors-online count and the recent visitors feed are cached.
      */
     public const ONLINE_CACHE_DURATION = 30;
+
+    /**
+     * @var int The most online visitors to ask Clicky for when marking them in the recent visitors feed.
+     */
+    public const ONLINE_LIST_LIMIT = 100;
 
     /**
      * @var int The default request timeout, in seconds, unless `config/guzzle.php` sets one.
@@ -828,6 +833,10 @@ class Api extends Component
      * Returns the most recent individual visitors, normalised for the live feed
      * (location, flag, browser/OS logos, referrer, duration, new vs returning).
      *
+     * Cached for {@see ONLINE_CACHE_DURATION} seconds, the same as the online
+     * count, so a visitor counted as online is also in the feed beside it. Each
+     * row says whether that visitor is online now.
+     *
      * @param string $date A Clicky date expression.
      * @param int $limit The maximum number of visitors.
      * @return array<int, array> The recent-visitor rows, newest first.
@@ -837,8 +846,12 @@ class Api extends Component
      */
     public function getRecentVisitors(string $date = 'last-7-days', int $limit = 12): array
     {
-        $items = $this->getStats(['visitors-list'], $date, ['limit' => $limit])['visitors-list'] ?? [];
-        return $this->_normalizeVisitors($items);
+        $items = $this->_flatten(
+            $this->_request(['visitors-list'], $date, ['limit' => $limit], self::ONLINE_CACHE_DURATION),
+            ['visitors-list'],
+        )['visitors-list'];
+
+        return $this->_normalizeVisitors($items, $this->_onlineSessionIds($date));
     }
 
     /**
@@ -951,15 +964,58 @@ class Api extends Component
     }
 
     /**
+     * Returns the session IDs of the visitors online now, as array keys.
+     *
+     * Clicky's visitor list doesn't say who is online, so its online-only list
+     * is fetched alongside and matched by session. Skipped when the online
+     * count is zero, and a failure here leaves the feed unmarked rather than
+     * empty.
+     *
+     * @param string $date A Clicky date expression, the same one the feed uses.
+     * @return array<string, true> The online session IDs, as keys.
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.2.0
+     */
+    private function _onlineSessionIds(string $date): array
+    {
+        try {
+            if ($this->getVisitorsOnline() === 0) {
+                return [];
+            }
+
+            $items = $this->_flatten(
+                $this->_request(
+                    ['visitors-list'],
+                    $date,
+                    ['online' => 1, 'limit' => self::ONLINE_LIST_LIMIT],
+                    self::ONLINE_CACHE_DURATION,
+                ),
+                ['visitors-list'],
+            )['visitors-list'];
+        } catch (RuntimeException) {
+            return [];
+        }
+
+        $ids = [];
+        foreach ($items as $item) {
+            $ids[(string)($item['session_id'] ?? '')] = true;
+        }
+        unset($ids['']);
+
+        return $ids;
+    }
+
+    /**
      * Normalises raw `visitors-list` items into feed rows (flag, browser/OS
      * logos, referrer, duration, new vs returning).
      *
      * @param array<int, array> $items The raw visitors-list items.
+     * @param array<string, true> $onlineSessionIds The session IDs of the visitors online now, as keys.
      * @return array<int, array> The normalised visitor rows.
      * @author John Henry Donovan <info@johnhenry.ie>
      * @since 1.0.0
      */
-    private function _normalizeVisitors(array $items): array
+    private function _normalizeVisitors(array $items, array $onlineSessionIds = []): array
     {
         $visitors = [];
         foreach ($items as $item) {
@@ -987,6 +1043,7 @@ class Api extends Component
                 'actions' => (int)($item['actions'] ?? 0),
                 'duration' => self::formatDuration((int)($item['time_total'] ?? 0)),
                 'returning' => (int)($item['total_visits'] ?? 1) > 1,
+                'online' => isset($onlineSessionIds[(string)($item['session_id'] ?? '')]),
                 'statsUrl' => self::_safeUrl((string)($item['stats_url'] ?? '')) ?? '',
             ];
         }
@@ -1193,9 +1250,12 @@ class Api extends Component
             // Without `daily`, there is a single date block; flatten its items.
             foreach (($block['dates'] ?? []) as $dateBlock) {
                 foreach (($dateBlock['items'] ?? []) as $item) {
-                    // Clicky HTML-encodes titles (e.g. "&amp;"); decode for display.
+                    // Clicky HTML-encodes titles (e.g. "&amp;"), and encodes an
+                    // apostrophe twice ("&amp;apos;"), so one decode leaves
+                    // "&apos;" behind.
                     if (isset($item['title'])) {
-                        $item['title'] = html_entity_decode((string)$item['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $title = html_entity_decode((string)$item['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $item['title'] = str_replace('&apos;', "'", $title);
                     }
                     // Referrer/stats URLs are attacker-influenceable (e.g. a
                     // crafted Referer header) and are rendered into href

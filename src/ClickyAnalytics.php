@@ -102,6 +102,7 @@ class ClickyAnalytics extends BasePlugin
         $this->_registerFieldTypes();
         $this->_registerTwigVariable();
         $this->_registerPermissions();
+        $this->_registerMcpCapabilities();
 
         if (!Craft::$app instanceof ConsoleApplication) {
             $this->_registerTrackingCode();

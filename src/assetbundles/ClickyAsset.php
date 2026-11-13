@@ -44,7 +44,7 @@ class ClickyAsset extends AssetBundle
         ];
 
         $this->js = [
-            'js/clicky.js',
+            'js/widgets.js',
         ];
 
         parent::init();

@@ -13,13 +13,16 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\services\Dashboard;
 use craft\services\Fields;
+use craft\services\Mcp;
 use craft\services\UserPermissions;
 use craft\web\twig\variables\CraftVariable;
+use CraftCms\Cms\Mcp\CapabilityRegistry;
 use johnhenry\clickyanalytics\ClickyAnalytics;
 use johnhenry\clickyanalytics\fields\PageStats;
 use johnhenry\clickyanalytics\helpers\DateRanges;
 use johnhenry\clickyanalytics\helpers\Palette;
 use johnhenry\clickyanalytics\helpers\TrackingCode;
+use johnhenry\clickyanalytics\mcp\Capabilities;
 use johnhenry\clickyanalytics\models\Settings;
 use johnhenry\clickyanalytics\variables\ClickyVariable;
 use johnhenry\clickyanalytics\widgets\Campaigns;
@@ -48,8 +51,8 @@ use yii\base\Event;
 /**
  * PluginTrait
  *
- * Wires the plugin's widgets, field type, Twig variable, front-end tracking
- * code and permissions, and owns its settings lifecycle. Keeps the main plugin
+ * Wires the plugin's widgets, field type, Twig variable, MCP tools, front-end
+ * tracking code and permissions, and owns its settings lifecycle. Keeps the main plugin
  * class a thin shell: the listeners here only hand work to the Api service and
  * never carry reporting logic themselves.
  *
@@ -255,6 +258,35 @@ trait PluginTrait
         }
 
         Craft::$app->getView()->registerHtml(TrackingCode::html($siteId, $settings->trackNoScript));
+    }
+
+    /**
+     * Offers the plugin's tools to Craft's MCP servers. Craft 5.12 collects
+     * them through an event on its MCP service; Craft 6 has a registry in the
+     * service container instead. Does nothing on Craft versions before 5.12,
+     * which have neither.
+     *
+     * @return void
+     * @author John Henry Donovan <info@johnhenry.ie>
+     * @since 1.2.0
+     */
+    private function _registerMcpCapabilities(): void
+    {
+        if (class_exists(Mcp::class)) {
+            Event::on(
+                Mcp::class,
+                Mcp::EVENT_REGISTER_CAPABILITY_TYPES,
+                static function(RegisterComponentTypesEvent $event) {
+                    $event->types[] = Capabilities::class;
+                }
+            );
+
+            return;
+        }
+
+        if (class_exists(CapabilityRegistry::class)) {
+            app(CapabilityRegistry::class)->register(Capabilities::class);
+        }
     }
 
     /**
