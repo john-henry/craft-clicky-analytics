@@ -1,8 +1,7 @@
 /* ============================================================================
  * Clicky Analytics dashboard & widget styles
- * Plausible-inspired: stat cards with trends, an area chart, and accent-coloured
- * top-N panels. Accent colour is supplied per panel via the --clicky-accent
- * custom property.
+ * Stat cards with trends, an area chart, and accent-coloured top-N panels.
+ * Each panel sets its accent through the --clicky-accent custom property.
  * ========================================================================== */
 
 /* Density & bar style (settings) ------------------------------------------ */
@@ -49,18 +48,14 @@
     height: 14px;
 }
 
-/* The full-width grey backdrop track behind a slim-style bar. Rendered for
-   every row regardless of bar style, but only given a visible size/colour
-   under .clicky--bar-slim below, so it has zero effect in the default
-   full-pill style. */
+/* The grey track behind a slim bar. Every row renders it; only
+   .clicky--bar-slim below gives it a size and colour. */
 .clicky-rank__track {
     display: none;
 }
 
-/* Slim bar style: ranked-list rows drop the full-height accent-tinted pill
-   fill in favour of a slightly taller accent bar sitting on a full-width grey
-   track, anchored to the row's bottom edge, so the row reads as a plain list
-   with a sparkline-style indicator rather than a bar chart. */
+/* Slim bar style: a thin accent bar on a full-width grey track along the
+   row's bottom edge, in place of the full-height tinted fill. */
 .clicky--bar-slim .clicky-rank__item {
     padding-left: 0;
     padding-right: 0;
@@ -83,9 +78,8 @@
     z-index: 0;
     height: 5px;
     border-radius: 2px;
-    /* Inherits the inline rank tint. At this thickness an L90% tint reads
-       faint against the grey track, so nudge it a touch darker to keep the
-       coloured portion legible without changing the underlying colour. */
+    /* At 5px an L90% rank tint is hard to tell from the grey track, so the
+       inline tint is darkened slightly here. */
     filter: brightness(0.9);
 }
 
@@ -325,8 +319,7 @@ craft-legacy-html-control:has(> .clicky-settings-field) {
     height: 11px;
 }
 
-/* Darkened from the brand green/orange-red to meet WCAG AA (4.5:1) on white;
- * the un-darkened tints are still used for backgrounds elsewhere. */
+/* Text shades of the brand green and orange-red that meet 4.5:1 on white. */
 .clicky-trend--good { color: #15803d; }
 .clicky-trend--bad { color: #c2410c; }
 
@@ -475,6 +468,13 @@ craft-legacy-html-control:has(> .clicky-settings-field) {
 .clicky-rank__item:focus-within .clicky-rank__ext,
 .clicky-rank__ext:focus-visible {
     opacity: 1;
+}
+
+/* Touch screens have no hover to reveal the link, so it stays visible. */
+@media (hover: none) {
+    .clicky-rank__ext {
+        opacity: 1;
+    }
 }
 
 .clicky-rank__ext:hover {
@@ -753,13 +753,9 @@ craft-legacy-html-control:has(> .clicky-settings-field) {
     padding: 0;
 }
 
-/* Each row is its own flex container (not a shared grid/subgrid): a row with
-   no browser/OS icons genuinely takes up no space for that gap, rather than
-   reserving a fixed-width column that renders empty. The trade-off, made
-   deliberately: rows no longer share exact column lines, so the time/stats
-   text won't sit at precisely the same horizontal position across rows when
-   some have an icon and others don't - that's the intended result, not a
-   regression, since the point is to close the gap on icon-less rows. */
+/* Each row is its own flex container, so a row without browser/OS icons
+   leaves no empty column for them. Rows don't share column lines as a
+   result, and the time/stats text can sit at slightly different positions. */
 .clicky-feed__row {
     display: flex;
     align-items: center;
@@ -774,7 +770,6 @@ craft-legacy-html-control:has(> .clicky-settings-field) {
 }
 
 .clicky-feed__flag {
-    /* Fixed, never shrinks or grows regardless of row width. */
     flex: 0 0 26px;
     display: inline-flex;
     align-items: center;
@@ -824,10 +819,6 @@ craft-legacy-html-control:has(> .clicky-settings-field) {
 }
 
 .clicky-feed__tech {
-    /* Sized to its own icons, nothing more - and now only rendered at all
-       (see _feed.twig) when there's at least one icon to show, so a row
-       with neither a browser nor an OS logo takes up zero space here
-       instead of reserving a fixed-width gap for nothing. */
     flex: 0 0 auto;
     display: flex;
     align-items: center;
@@ -890,13 +881,8 @@ craft-legacy-html-control:has(> .clicky-settings-field) {
     color: #b45309;
 }
 
-/* Reacts to the feed list's own rendered width, not the browser viewport;
-   the same markup runs inside a wide dashboard panel, a narrow dashboard
-   widget column, and the narrow entry-edit sidebar field, and only the
-   container query sees which one it's actually in. Flexbox handles the flag
-   staying fixed and the who column shrinking/ellipsizing on its own, so the
-   only thing left to adjust here is hiding the browser/OS icons to save
-   space once the row gets genuinely narrow. */
+/* The feed appears in wide dashboard panels, narrow widget columns and the
+   entry sidebar, so this keys off the list's own width, not the viewport. */
 @container clicky-feed (max-width: 420px) {
     .clicky-feed__tech {
         display: none;

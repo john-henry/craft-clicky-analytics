@@ -65,6 +65,7 @@ class ClickyAsset extends AssetBundle
         $view->registerTranslations('clicky-analytics', [
             'Loading…',
             'Couldn’t load this country.',
+            'Loaded cities and regions for {label}.',
             'Request failed.',
         ]);
     }

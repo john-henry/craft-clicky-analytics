@@ -134,7 +134,7 @@
 
 {% set schemeOverridden = 'colorScheme' in overrides %}
 {% set schemeInput %}
-    <div class="clicky-schemes" role="radiogroup" aria-label="{{ 'Colour scheme'|t('clicky-analytics') }}">
+    <div class="clicky-schemes">
         {% for value, scheme in colorSchemes %}
             <label class="clicky-scheme">
                 <input type="radio" name="colorScheme" value="{{ value }}" {{ value == settings.colorScheme ? 'checked' }} {{ schemeOverridden ? 'disabled' }}>
@@ -149,6 +149,7 @@
     </div>
 {% endset %}
 {{ forms.field({
+    fieldset: true,
     id: 'colorScheme',
     label: 'Colour scheme'|t('clicky-analytics'),
     instructions: 'The accent colours used across the widgets and the page-stats field.'|t('clicky-analytics'),

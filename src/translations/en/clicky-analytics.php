@@ -84,7 +84,9 @@ return [
     // Ranked lists & country drilldown
     // =========================================================================
     'Open in Clicky' => 'Open in Clicky',
+    '(opens in a new tab)' => '(opens in a new tab)',
     'Show cities and regions' => 'Show cities and regions',
+    'Show cities and regions for {label}' => 'Show cities and regions for {label}',
     'Cities and regions for {label}' => 'Cities and regions for {label}',
     'No data for this period.' => 'No data for this period.',
     'Rows' => 'Rows',
@@ -95,6 +97,7 @@ return [
     'Let editors expand a country to see its cities and regions.' => 'Let editors expand a country to see its cities and regions.',
     'Loading…' => 'Loading…',
     'Couldn’t load this country.' => 'Couldn’t load this country.',
+    'Loaded cities and regions for {label}.' => 'Loaded cities and regions for {label}.',
 
     // Live feed
     // =========================================================================
@@ -161,7 +164,7 @@ return [
     'Recent visitor count' => 'Recent visitor count',
     'How many recent visitors to list.' => 'How many recent visitors to list.',
     'Show summary' => 'Show summary',
-    'The visitors / actions / bounce / time cards.' => 'The visitors / actions / bounce / time cards.',
+    'The visitor, action, bounce rate and average time figures.' => 'The visitor, action, bounce rate and average time figures.',
     'Show traffic sources' => 'Show traffic sources',
     'Show recent visitors' => 'Show recent visitors',
     'Unique' => 'Unique',
@@ -188,7 +191,7 @@ return [
     'Compact density' => 'Compact density',
     'Use a more compact layout for the widgets and page-stats field instead of comfortable spacing.' => 'Use a more compact layout for the widgets and page-stats field instead of comfortable spacing.',
     'Slim bar style' => 'Slim bar style',
-    'Use a slimmer toolbar instead of the full-size bar.' => 'Use a slimmer toolbar instead of the full-size bar.',
+    'Use slimmer bars in the ranked lists instead of full-height ones.' => 'Use slimmer bars in the ranked lists instead of full-height ones.',
     'This is being overridden by the clicky-analytics.php config file.' => 'This is being overridden by the clicky-analytics.php config file.',
     'Clicky is a trademark of Roxr Software Ltd. This is an unofficial, community plugin.' => 'Clicky is a trademark of Roxr Software Ltd. This is an unofficial, community plugin.',
 
@@ -210,7 +213,7 @@ return [
 
     // Permissions
     // =========================================================================
-    'Add Clicky Analytics dashboard widgets' => 'Add Clicky Analytics dashboard widgets',
+    'View Clicky Analytics data and add its dashboard widgets' => 'View Clicky Analytics data and add its dashboard widgets',
 
     // Test connection
     // =========================================================================

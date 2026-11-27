@@ -64,7 +64,7 @@
     "developer": "John Henry",
     "developerUrl": "https://johnhenry.ie",
     "documentationUrl": "https://johnhenry.ie/plugins/clicky-analytics/",
-    "changelogUrl": "https://github.com/john-henry/craft-clicky-analytics/blob/main/CHANGELOG.md",
+    "changelogUrl": "https://github.com/john-henry/craft-clicky-analytics/blob/craft-5/CHANGELOG.md",
     "class": "johnhenry\\clickyanalytics\\ClickyAnalytics"
   }
 }

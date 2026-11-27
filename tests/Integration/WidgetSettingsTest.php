@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Regression coverage for widget settings persistence.
+ * Widget settings persistence.
  *
- * Settings properties declared on an abstract base widget (dateRange on
- * BaseStatsWidget, limit on BaseListWidget) are dropped by Craft's default
- * settingsAttributes(), which excludes properties whose declaring class is
- * abstract. Each base re-includes its own property; these tests prove the
- * settings now serialise (and so persist) instead of reverting to the default.
+ * Craft's default settingsAttributes() leaves out properties declared on an
+ * abstract class, which would drop dateRange (BaseStatsWidget) and limit
+ * (BaseListWidget). Each base adds its own property back; these tests pin
+ * that the settings serialise, so a saved value survives a reload.
  */
 
 use johnhenry\clickyanalytics\widgets\Overview;

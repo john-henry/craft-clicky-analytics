@@ -37,7 +37,7 @@
                         </span>
                     {% endif %}
                     {% if row.url is defined and row.url starts with 'http' %}
-                        <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ label }}</a>
+                        <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ label }}<span class="visually-hidden"> {{ '(opens in a new tab)'|t('clicky-analytics') }}</span></a>
                     {% else %}
                         {{ label }}
                     {% endif %}
@@ -48,7 +48,7 @@
                         {% if row.value_percent is defined %}<em>{{ row.value_percent }}%</em>{% endif %}
                     </span>
                     {% if row.stats_url is defined and row.stats_url %}
-                        <a class="clicky-rank__ext" href="{{ row.stats_url }}" target="_blank" rel="noopener noreferrer" title="{{ 'Open in Clicky'|t('clicky-analytics') }}" aria-label="{{ 'Open in Clicky'|t('clicky-analytics') }}">{% include 'clicky-analytics/_components/_icon' with { name: 'external' } only %}</a>
+                        <a class="clicky-rank__ext" href="{{ row.stats_url }}" target="_blank" rel="noopener noreferrer" title="{{ 'Open in Clicky'|t('clicky-analytics') }}" aria-label="{{ 'Open in Clicky'|t('clicky-analytics') }} {{ '(opens in a new tab)'|t('clicky-analytics') }}">{% include 'clicky-analytics/_components/_icon' with { name: 'external' } only %}</a>
                     {% endif %}
                 </span>
             </li>
