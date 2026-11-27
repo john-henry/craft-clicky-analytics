@@ -10,6 +10,7 @@
 {% endfor %}
 
 {{ forms.selectField({
+    fieldClass: 'clicky-settings-field',
     label: 'Display'|t('clicky-analytics'),
     instructions: 'How to visualise the metric.'|t('clicky-analytics'),
     id: 'display',

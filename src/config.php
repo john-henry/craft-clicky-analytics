@@ -40,12 +40,15 @@ return [
     //     ],
     // ],
 
-    // The date range widgets and the page-stats field use by default. One of:
+    // The date range dashboard widgets use by default. The page-stats field and
+    // the Twig variable have their own defaults. One of:
     // today, yesterday, 2-days-ago, last-7-days, last-14-days, last-28-days,
     // last-60-days, last-90-days.
     'defaultDateRange' => 'last-7-days',
 
-    // How long, in seconds, to cache Clicky API responses (0 disables caching).
+    // How long, in seconds, to cache Clicky API responses (0 disables caching,
+    // except for the visitors-online count and recent visitors feed, which are
+    // always cached for 30 seconds).
     'cacheDuration' => 300,
 
     // The accent colour scheme. One of: clicky, ocean, mono, forest, berry.

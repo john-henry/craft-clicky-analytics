@@ -49,9 +49,8 @@ describe('Palette::schemes() and swatches()', function () {
 describe('Palette colours for the active scheme', function () {
     it('returns the scheme primary', function () {
         useScheme('clicky');
-        // AA-corrected accent (darkened from the original #ee5a24 brand
-        // orange so it passes 4.5:1 on white as a chart stroke and as
-        // 12px+ bold text).
+        // The accent passes 4.5:1 on white as a chart stroke and as 12px+
+        // bold text.
         expect(Palette::primary())->toBe('#d9553f');
     });
 

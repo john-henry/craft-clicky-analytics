@@ -1,6 +1,7 @@
 {% import '_includes/forms' as forms %}
 
 {{ forms.textField({
+    fieldClass: 'clicky-settings-field',
     label: 'Rows'|t('clicky-analytics'),
     instructions: 'How many visitors to show.'|t('clicky-analytics'),
     id: 'limit',

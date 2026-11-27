@@ -41,15 +41,13 @@ abstract class Palette
     /**
      * @var array<string, array{primary: string, palette: string[], pie: string[], bars: string[], secondary: string, soft: string}> The colour schemes.
      *
-     * Notes on the newer per-scheme values:
+     * Per-scheme values:
      *  - `primary` is the scheme accent used for the chart line, the donut's
-     *    first slice, and per-widget accents. It is darkened where needed to
-     *    pass WCAG AA (4.5:1) on white so it stays safe as a chart stroke and
-     *    as text at 12px+ bold.
+     *    first slice, and per-widget accents. It passes WCAG AA (4.5:1) on
+     *    white, so it is safe as a chart stroke and as text at 12px+ bold.
      *  - `bars` are four ranked-list row tints (rank 1 to 4). They sit at
-     *    roughly L90% deliberately, so the existing dark row text keeps AA
-     *    contrast at 13px on top of them. The rank-4 tint is intentionally
-     *    near-neutral to keep long tails quiet.
+     *    roughly L90% so the dark row text keeps AA contrast at 13px on top
+     *    of them. The rank-4 tint is near-neutral to keep long tails quiet.
      *  - `secondary` is the donut's "returning" slice. It is a fill-only
      *    colour: fine at 12px+ bold, but not safe as small or fine text.
      *  - `soft` is the chart area fill: a light pastel meant to be used
@@ -134,9 +132,8 @@ abstract class Palette
             $scheme = self::SCHEMES[$key];
             $out[$key] = [
                 'label' => $label,
-                // The accent plus the four rank-tint bars: this is what the
-                // scheme actually looks like on the ranked-list widgets now,
-                // rather than a slice of the old per-role palette.
+                // The accent plus the four rank tints, which is how the scheme
+                // looks on the ranked-list widgets.
                 'colors' => array_merge([$scheme['primary']], $scheme['bars']),
             ];
         }

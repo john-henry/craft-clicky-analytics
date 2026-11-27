@@ -1,5 +1,26 @@
 # Release Notes for Clicky Analytics
 
+## 1.2.0 - 2026-11-27
+
+### Added
+- Craft CMS 6 support. Craft 6 needs PHP 8.5, and your project has to require the `craftcms/yii2-adapter` package itself.
+- Three read-only tools for AI agents on Craft's MCP server, on Craft 5.12 and later and on Craft 6: `clicky_analytics_overview`, `clicky_analytics_report` and `clicky_analytics_page_stats`.
+- Live Visitors marks the visitors who are online now with a green dot.
+
+### Changed
+- Line charts in widgets three or more columns wide are shorter.
+- Live Visitors is cached for 30 seconds rather than the cache duration, so it keeps up with Visitors Online.
+
+### Fixed
+- Ad blockers no longer block the plugin's control panel script, which stopped the country drilldown in Top Countries from opening.
+- Page titles with an apostrophe no longer show `&apos;` in the widgets.
+- The New and Returning badges in Live Visitors are no longer cut off after a long location.
+- The settings screen no longer logs a deprecation warning on Craft 6.
+- Screen readers now announce links that open in a new tab in the widgets, the Page Stats field and the settings page.
+- Screen readers now announce when a country's cities and regions have loaded in Top Countries, or that they couldn't be loaded.
+- The Open in Clicky link in the widgets now shows on touch screens.
+- The changelog link for the plugin in the control panel now works.
+
 ## 1.1.0 - 2026-09-25 [CRITICAL]
 
 > [!IMPORTANT]

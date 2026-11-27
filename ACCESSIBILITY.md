@@ -1,12 +1,12 @@
 # Accessibility statement for Clicky Analytics
 
-Clicky Analytics is a plugin for Craft CMS 5. This statement sets out how accessible it is, what I know is wrong with it, and how to tell me about anything else.
+Clicky Analytics is a plugin for Craft CMS 5 and 6. This statement sets out how accessible it is, what I know is wrong with it, and how to tell me about anything else.
 
 ## What this covers
 
-This statement covers Clicky Analytics 1.1.0:
+This statement covers Clicky Analytics 1.2.0:
 
-- the dashboard widgets
+- the dashboard widgets, including the country drilldown in Top Countries and the online-now marker in Live Visitors
 - the Page Stats field, which shows a page's figures on its entry
 - the settings page, including the colour scheme picker and connection test
 
@@ -15,6 +15,7 @@ It doesn't cover:
 - Craft's own control panel, which Craft reports on at https://craftcms.com/accessibility
 - your site's own templates and content
 - Clicky's own website, which the plugin links to
+- the tools for AI agents on Craft's MCP server, which have no interface of their own
 
 ## The standard I'm working to
 
@@ -22,13 +23,14 @@ WCAG 2.2 level AA. Clicky Analytics adds to the Craft control panel, which is an
 
 ## How far it meets it
 
-I believe it meets WCAG 2.2 AA. The review found four issues, and this version fixes all of them. It hasn't been tested with assistive technology yet, though, so I'm not claiming full conformance until it has.
+I believe it meets WCAG 2.2 AA. The review found three issues, and this version fixes all of them. It hasn't been tested with assistive technology yet, though, so I'm not claiming full conformance until it has.
 
 ## How it was checked
 
-Last checked in September 2026:
+Last checked in November 2026:
 
-- A review of every control panel template, script and stylesheet against WCAG 2.2 AA, including the WAI-ARIA Authoring Practices for any custom widgets, and contrast ratios worked out from the actual colours in the CSS.
+- A review of every control panel template, script and stylesheet against WCAG 2.2 AA, including the WAI-ARIA Authoring Practices for the drilldown, and contrast ratios worked out from the actual colours in the CSS against Craft's own text colours.
+- The charts were checked for a text alternative: each line chart has a data table behind it for screen readers, and the donut charts have a legend with the figures.
 - Not done yet: testing with screen readers (NVDA, JAWS and VoiceOver), zoom and reflow at 400%, or speech input. This statement will be updated once that's done.
 
 ## Known issues
@@ -41,4 +43,4 @@ If something in Clicky Analytics is hard or impossible for you to use, open an i
 
 ## Last reviewed
 
-27 September 2026, for version 1.1.0.
+24 November 2026, for version 1.2.0.

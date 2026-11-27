@@ -44,7 +44,7 @@ class ClickyAsset extends AssetBundle
         ];
 
         $this->js = [
-            'js/clicky.js',
+            'js/widgets.js',
         ];
 
         parent::init();
@@ -65,6 +65,7 @@ class ClickyAsset extends AssetBundle
         $view->registerTranslations('clicky-analytics', [
             'Loading…',
             'Couldn’t load this country.',
+            'Loaded cities and regions for {label}.',
             'Request failed.',
         ]);
     }

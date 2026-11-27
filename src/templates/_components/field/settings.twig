@@ -1,6 +1,7 @@
 {% import '_includes/forms' as forms %}
 
 {{ forms.selectField({
+    fieldClass: 'clicky-settings-field',
     label: 'Date range'|t('clicky-analytics'),
     instructions: 'The period the page stats cover.'|t('clicky-analytics'),
     id: 'dateRange',
@@ -23,7 +24,7 @@
 
 {{ forms.lightswitchField({
     label: 'Show summary'|t('clicky-analytics'),
-    instructions: 'The visitors / actions / bounce / time cards.'|t('clicky-analytics'),
+    instructions: 'The visitor, action, bounce rate and average time figures.'|t('clicky-analytics'),
     id: 'showSummary',
     name: 'showSummary',
     on: field.showSummary,

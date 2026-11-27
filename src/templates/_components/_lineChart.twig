@@ -2,7 +2,8 @@
     <p class="clicky-muted">{{ 'No data for this period.'|t('clicky-analytics') }}</p>
 {% else %}
     {% set compact = compact ?? false %}
-    {% set w = compact ? 500 : 1000 %}{% set h = compact ? 190 : 300 %}
+    {% set wide = wide ?? false %}
+    {% set w = compact ? 500 : (wide ? 1600 : 1000) %}{% set h = compact ? 190 : 300 %}
     {% set gradientId = 'clicky-area-' ~ random(100000, 999999) %}
     {% set padL = 38 %}{% set padR = 12 %}{% set padT = 12 %}{% set padB = 28 %}
     {% set plotW = w - padL - padR %}

@@ -196,6 +196,7 @@ class ReportWidget extends BaseListWidget
                 'series' => $api->getDailySeries($tally, $date),
                 'label' => self::totalOptions()[$tally],
                 'compactChart' => ($this->colspan ?? 1) < 2,
+                'wideChart' => ($this->colspan ?? 1) > 2,
             ];
         }
 

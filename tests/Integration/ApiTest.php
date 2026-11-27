@@ -112,6 +112,15 @@ describe('Api::getStats()', function () {
         expect($api->getStats(['pages'], 'today')['pages'][0]['title'])->toBe('Tom & Jerry');
     });
 
+    it('decodes the apostrophe Clicky encodes twice', function () {
+        $api = clickyApi();
+        seedClicky(['pages'], 'today', [], [
+            clickyBlock('pages', [['title' => 'Why scanners can&amp;apos;t settle it', 'value' => 1]]),
+        ]);
+
+        expect($api->getStats(['pages'], 'today')['pages'][0]['title'])->toBe('Why scanners can\'t settle it');
+    });
+
     it('keeps a well-formed http(s) url and stats_url', function () {
         $api = clickyApi();
         seedClicky(['links-domains'], 'today', [], [
@@ -230,6 +239,7 @@ describe('Api::getSegments()', function () {
 describe('Api::getRecentVisitors()', function () {
     it('keeps a well-formed http(s) landing page', function () {
         $api = clickyApi();
+        seedClicky(['visitors-online'], 'today', [], [clickyBlock('visitors-online', [['value' => 0]])]);
         seedClicky(['visitors-list'], 'last-7-days', ['limit' => 12], [
             clickyBlock('visitors-list', [[
                 'time' => time(),
@@ -242,6 +252,7 @@ describe('Api::getRecentVisitors()', function () {
 
     it('strips a landing page with a non-http(s) scheme', function () {
         $api = clickyApi();
+        seedClicky(['visitors-online'], 'today', [], [clickyBlock('visitors-online', [['value' => 0]])]);
         seedClicky(['visitors-list'], 'last-7-days', ['limit' => 12], [
             clickyBlock('visitors-list', [[
                 'time' => time(),
@@ -250,6 +261,48 @@ describe('Api::getRecentVisitors()', function () {
         ]);
 
         expect($api->getRecentVisitors()[0]['landingPage'])->toBe('');
+    });
+
+    it('marks the visitors Clicky lists as online', function () {
+        $api = clickyApi();
+        seedClicky(['visitors-online'], 'today', [], [clickyBlock('visitors-online', [['value' => 1]])]);
+        seedClicky(['visitors-list'], 'last-7-days', ['limit' => 12], [
+            clickyBlock('visitors-list', [
+                ['time' => time(), 'session_id' => '501'],
+                ['time' => time() - 3600, 'session_id' => '500'],
+            ]),
+        ]);
+        seedClicky(['visitors-list'], 'last-7-days', ['online' => 1, 'limit' => Api::ONLINE_LIST_LIMIT], [
+            clickyBlock('visitors-list', [['time' => time(), 'session_id' => '501']]),
+        ]);
+
+        $visitors = $api->getRecentVisitors();
+
+        expect($visitors[0]['online'])->toBeTrue()
+            ->and($visitors[1]['online'])->toBeFalse();
+    });
+
+    it('marks nobody, and asks for no online list, when the online count is zero', function () {
+        $api = clickyApiWithMock([]);
+        seedClicky(['visitors-online'], 'today', [], [clickyBlock('visitors-online', [['value' => 0]])]);
+        seedClicky(['visitors-list'], 'last-7-days', ['limit' => 12], [
+            clickyBlock('visitors-list', [['time' => time(), 'session_id' => '501']]),
+        ]);
+
+        expect($api->getRecentVisitors()[0]['online'])->toBeFalse()
+            ->and(clickyRequestQueries())->toBe([]);
+    });
+
+    it('still returns the feed, unmarked, when the online lookup fails', function () {
+        $api = clickyApiWithMock([new GuzzleHttp\Psr7\Response(500, [], 'boom')]);
+        seedClicky(['visitors-list'], 'last-7-days', ['limit' => 12], [
+            clickyBlock('visitors-list', [['time' => time(), 'session_id' => '501']]),
+        ]);
+
+        $visitors = $api->getRecentVisitors();
+
+        expect($visitors)->toHaveCount(1)
+            ->and($visitors[0]['online'])->toBeFalse();
     });
 });
 
